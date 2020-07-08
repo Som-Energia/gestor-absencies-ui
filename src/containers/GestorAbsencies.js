@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const breadcrumbNameMap = {
-  '/absences': 'Absències',
+  '': 'Absències',
   '/member': 'El meu perfil',
   '/calendar': 'Calendari',
   '/et': 'ET',
@@ -76,13 +76,12 @@ const breadcrumbNameMap = {
 }
 
 const breadcrumbIconMap = {
-  '/absences': <ViewCompactIcon />,
+  '': <ViewCompactIcon />,
   '/member': <PersonIcon />,
   '/calendar': <CalendarTodayIcon />,
   '/et': <GroupIcon />,
   '/somenergia': <SettingsIcon />
 }
-
 
 const GestorAbsencies = (props) => {
   const { window } = props
@@ -176,9 +175,6 @@ const GestorAbsencies = (props) => {
 
         <Switch>
           <Route exact path={path}>
-            <h1>Main</h1>
-          </Route>
-          <Route exact path={`${path}/absences`}>
             <Absences />
           </Route>
           <Route exact path={`${path}/member`}>
@@ -193,7 +189,6 @@ const GestorAbsencies = (props) => {
           <Route exact path={`${path}/somenergia`}>
             <SomEnergia />
           </Route>
-
         </Switch>
       </main>
     </div>
