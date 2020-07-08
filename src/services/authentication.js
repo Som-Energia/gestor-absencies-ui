@@ -11,5 +11,5 @@ export const loginService = async (username, password) => {
     .then(response => {
       return response
     })
-    .catch(error => console.log(error))
+    .catch(error => error)
 }

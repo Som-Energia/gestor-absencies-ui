@@ -1,18 +1,20 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 
 import Avatar from '@material-ui/core/Avatar'
-import Button from '@material-ui/core/Button'
-import CssBaseLine from '@material-ui/core/CssBaseLine'
-import TextField from '@material-ui/core/TextField'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import Checkbox from '@material-ui/core/Checkbox'
-import Link from '@material-ui/core/Link'
-import Grid from '@material-ui/core/Grid'
 import Box from '@material-ui/core/Box'
+import Button from '@material-ui/core/Button'
+import Checkbox from '@material-ui/core/Checkbox'
+import CssBaseLine from '@material-ui/core/CssBaseLine'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import FormHelperText from '@material-ui/core/FormHelperText'
+import Link from '@material-ui/core/Link'
+import TextField from '@material-ui/core/TextField'
+import Grid from '@material-ui/core/Grid'
+
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 
@@ -50,7 +52,7 @@ const Login = (props) => {
   const classes = useStyles()
   const history = useHistory()
 
-  const { user, login, isAuthenticated } = useAuthState()
+  const { user, login, isAuthenticated, isError, error } = useAuthState()
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -58,8 +60,8 @@ const Login = (props) => {
     }
   }, [user, isAuthenticated, history])
 
-  const doLogin = async (username, password) => {
-    await login(username, password)
+  const doLogin = (username, password) => {
+    return login(username, password)
   }
 
   return (
@@ -89,7 +91,15 @@ const Login = (props) => {
           }
           onSubmit={(values, { setSubmitting }) => {
             const { email, password } = values
+            setSubmitting(true)
             doLogin(email, password)
+              .then(() => {
+                setSubmitting(false)
+              })
+              .catch((error) => {
+                console.log(error)
+                setSubmitting(false)
+              })
           }}
         >
           {({
@@ -115,8 +125,8 @@ const Login = (props) => {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 value={values.email}
-                error={!!props.error || (touched.email && errors.email)}
-                helperText={(touched.email && errors.email) || props.error}
+                error={errors.email && touched.email}
+                helperText={touched.email && errors.email}
               />
               <TextField
                 required
@@ -138,13 +148,17 @@ const Login = (props) => {
                 control={<Checkbox value="remember" color="primary" />}
                 label="Recorda'm"
               />
+              {
+                isError &&
+                <FormHelperText variant="standard" error={true}>Hi ha hagut algun problema!</FormHelperText>
+              }
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
                 className={classes.submit}
-                disabled={props.fetching}
+                disabled={isSubmitting}
               >
                 Entrar
               </Button>
