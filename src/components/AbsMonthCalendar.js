@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
   monthGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(7,1fr)',
-    margin: '16px 32px 32px 32px',
+    margin: '12px 32px 32px 32px',
     padding: 0
   },
   monthDay: {
@@ -40,7 +40,6 @@ const AbsMonthCalendar = (props) => {
 
   const monthRef = moment().set('month', month)
   const monthName = monthRef.format('MMMM')
-  const daysInMonth = Array.from(Array(monthRef.daysInMonth()).keys())
 
   const firstDay = monthRef.startOf('month')
   const lastDay = monthRef.endOf('month')
@@ -51,15 +50,15 @@ const AbsMonthCalendar = (props) => {
       <div className={classes.monthName}>{monthName}</div>
       <div className={classes.monthGrid}>
         {
-          [...new Array(numFirstDay - 1).keys()].map(() => (
-            <div className={classes.monthDay}>
+          [...new Array(numFirstDay - 1).keys()].map((number) => (
+            <div key={number} className={classes.monthDay}>
               <div></div>
             </div>
           ))
         }
         {
           [...new Array(lastDay.date()).keys()].map(day => (
-            <div className={classes.monthDay}>
+            <div key={day} className={classes.monthDay}>
               <div>•</div>
             </div>
           ))

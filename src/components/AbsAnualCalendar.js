@@ -10,7 +10,7 @@ const AbsAnualCalendar = () => {
   return (
     <Grid container>
       { months.map(month => (
-        <Grid item xs={6} sm={4}>
+        <Grid key={month} item xs={6} sm={4}>
           <AbsMonthCalendar month={month} />
         </Grid>
       )) }
