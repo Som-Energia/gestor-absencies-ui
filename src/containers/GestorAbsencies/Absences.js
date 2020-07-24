@@ -1,23 +1,48 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import moment from 'moment'
+import clsx from 'clsx'
 
 import Card from '@material-ui/core/Card'
-import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
-import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
+import Paper from '@material-ui/core/Paper'
+import Zoom from '@material-ui/core/Zoom'
 
 import { makeStyles } from '@material-ui/core/styles'
+
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos'
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
+import IconButton from '@material-ui/core/IconButton'
+import MoreVertIcon from '@material-ui/icons/MoreVert'
+
+import { useAuthState } from '../../context/auth'
+import { useFetch, useFetchAbsencesType, useFetchMember } from '../../services/absences'
 
 import AbsAnualCalendar from '../../components/AbsAnualCalendar'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(2),
-    padding: theme.spacing(1)
+    marginTop: theme.spacing(1),
+    padding: theme.spacing(1),
+    paddingBottom: '12px'
+  },
+  noMarginTop: {
+    marginTop: 0
+  },
+  contentItem: {
+    padding: '16px 0 16px 16px',
+    '&:last-child': {
+      paddingBottom: '16px'
+    }
   },
   yearContainer: {
     display: 'flex',
-    justifyContent: 'center'
+    justifyContent: 'space-around',
+    marginTop: '16px',
+    '& h1': {
+      fontSize: '36px'
+    }
   },
   resum: {
     display: 'flex',
@@ -35,61 +60,184 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '14px',
     letterSpacing: '1px',
     textTransform: 'uppercase'
+  },
+  item: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  itemTime: {
+    width: '50px',
+    height: '60px',
+    background: '#f2f4f5',
+    textAlign: 'center',
+    borderRadius: '3px',
+    overflow: 'hidden'
+  },
+  itemMonth: {
+    fontSize: '14px',
+    height: '20px',
+    lineHeight: '20px',
+    background: theme.palette.primary.main,
+    color: '#fff',
+    fontWeight: 600,
+    textTransform: 'uppercase'
+  },
+  itemDay: {
+    fontSize: '24px',
+    height: '28px',
+    lineHeight: '36px',
+    color: '#1c242b',
+    fontWeight: '400'
+  },
+  itemDuration: {
+    fontSize: '10px',
+    lineHeight: '10px',
+    textTransform: 'uppercase'
+  },
+  timeSeparator: {
+    margin: '0 4px',
+    color: 'rgba(0, 0, 0, 0.5)'
+  },
+  itemContent: {
+    flex: '1 1 auto',
+    minWidth: 0,
+    marginLeft: '24px',
+    '& h5': {
+      flex: '1 1 auto',
+      minWidth: 0,
+      fontWeight: '400',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      fontSize: '16px',
+      lineHeight: '25px',
+      textTransform: 'uppercase',
+      margin: 0
+    },
+    '& div': {
+      color: '#4d4d4d',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      fontSize: '16px',
+      lineHeight: '25px'
+    }
   }
 }))
 
+const AbsencePeriod = (props) => {
+  const classes = useStyles()
+  const { absence, types } = props
+  const { start_time, end_time, absence_type } = absence
+
+  const absenceType = types.filter(({ id }) => id === absence_type)[0]?.name
+
+  return (
+    <div className={classes.item}>
+      <div className={classes.itemTime}>
+        <div className={classes.itemMonth}>
+          { moment(start_time).format('MMM') }
+        </div>
+        <div className={classes.itemDay}>
+          { moment(start_time).format('DD') }
+        </div>
+        <div className={classes.itemDuration}>
+          { moment(start_time).format('H') === '13' ? 'Tarda' : '' }
+        </div>
+      </div>
+      {
+        moment(start_time).isSame(end_time, 'day')
+          ? ''
+          : <>
+            <ArrowForwardIcon className={classes.timeSeparator} />
+            <div className={classes.itemTime}>
+              <div className={classes.itemMonth}>
+                { moment(end_time).format('MMM') }
+              </div>
+              <div className={classes.itemDay}>
+                { moment(end_time).format('DD') }
+              </div>
+              <div className={classes.itemDuration}>
+                { moment(end_time).format('H') === '13' ? 'Matí' : '' }
+              </div>
+            </div>
+          </>
+      }
+      <div className={classes.itemContent}>
+        {
+          absenceType &&
+            <h5>{ absenceType }</h5>
+        }
+        <div>
+          {
+            Math.round(moment.duration(moment(end_time).diff(moment(start_time))).asDays())
+          }
+          &nbsp;dies
+        </div>
+      </div>
+      <IconButton aria-label="actions">
+        <MoreVertIcon />
+      </IconButton>
+    </div>
+  )
+}
+
 const Absences = () => {
   const classes = useStyles()
-  const [yearRef, setYearRef] = useState('2020')
+  const [year, setYear] = useState('2020')
+
+  const { user } = useAuthState()
+
+  const [{ data, loading, error }, fetch] = useFetch()
+  const [{ types, loadingTypes, errorTypes }, fetchTypes] = useFetchAbsencesType()
+  const [{ member, loadingMember, errorMember }, fetchMember] = useFetchMember()
+
+  useEffect(() => {
+    fetch(`/absencies/absences?worker=${user.user_id}&start_period=${year}-01-01&end_period=${year}-12-31`)
+    fetchTypes()
+    fetchMember(user.user_id)
+  }, [year, user])
+
+  console.log(data)
 
   return (
     <>
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          <Card className={classes.paper} elevation={0}>
-            <CardContent className={classes.yearContainer}><h1>{yearRef}</h1></CardContent>
-          </Card>
+          <Paper className={classes.yearContainer} elevation={0}>
+            <IconButton aria-label="prev year">
+              <ArrowBackIosIcon />
+            </IconButton>
+            <h1>{year}</h1>
+            <IconButton aria-label="next year">
+              <ArrowForwardIosIcon />
+            </IconButton>
+          </Paper>
         </Grid>
         <Grid item xs={12} sm={5}>
-          <Card className={classes.paper} elevation={0}>
-            <CardContent>
-              <Typography paragraph>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-                ut labore et dolore magna aliqua. Rhoncus dolor purus non enim praesent elementum
-                facilisis leo vel. Risus at ultrices mi tempus imperdiet. Semper risus in hendrerit
-                gravida rutrum quisque non tellus. Convallis convallis tellus id interdum velit laoreet id
-                donec ultrices. Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-                adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra nibh cras.
-                Metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Mauris commodo quis
-                imperdiet massa tincidunt. Cras tincidunt lobortis feugiat vivamus at augue. At augue eget
-                arcu dictum varius duis at consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem
-                donec massa sapien faucibus et molestie ac.
-              </Typography>
-              <Typography paragraph>
-                Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper eget nulla
-                facilisi etiam dignissim diam. Pulvinar elementum integer enim neque volutpat ac
-                tincidunt. Ornare suspendisse sed nisi lacus sed viverra tellus. Purus sit amet volutpat
-                consequat mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis risus sed
-                vulputate odio. Morbi tincidunt ornare massa eget egestas purus viverra accumsan in. In
-                hendrerit gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem et
-                tortor. Habitant morbi tristique senectus et. Adipiscing elit duis tristique sollicitudin
-                nibh sit. Ornare aenean euismod elementum nisi quis eleifend. Commodo viverra maecenas
-                accumsan lacus vel facilisis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a.
-              </Typography>
-            </CardContent>
-          </Card>
+          {
+            data?.results && types?.results &&
+              data?.results.map((absence, index) => (
+                <Zoom in={true}>
+                  <Card className={clsx(classes.paper, !index && classes.noMarginTop)} elevation={0}>
+                    <CardContent className={classes.contentItem}>
+                      <AbsencePeriod absence={absence} types={types?.results} />
+                    </CardContent>
+                  </Card>
+                </Zoom>
+              ))
+          }
         </Grid>
         <Grid item xs={12} sm={7}>
-
-          <Card className={classes.paper} elevation={0}>
+          <Card className={clsx(classes.paper, classes.noMarginTop)} elevation={0}>
             <CardContent>
               <div className={classes.resum}>
                 <div className={classes.resumItem}>
-                  <div className={classes.super}>25</div>
+                  <div className={classes.super}>{ '-' }</div>
                   <div className={classes.superDesc}>DIES TOTALS</div>
                 </div>
                 <div className={classes.resumItem}>
-                  <div className={classes.super}>88.5</div>
+                  <div className={classes.super}>{member?.holidays ? member?.holidays : '-' }</div>
                   <div className={classes.superDesc}>DIES DISPONIBLES</div>
                 </div>
                 <div className={classes.resumItem}>

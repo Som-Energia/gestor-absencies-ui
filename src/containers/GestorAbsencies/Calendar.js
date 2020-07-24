@@ -19,7 +19,14 @@ import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginTop: theme.spacing(2)
+    marginTop: theme.spacing(2),
+    overflowX: 'auto'
+  },
+  header: {
+    fontWeight: 500
+  },
+  workingDay: {
+    backgroundColor: '#f2f2f2'
   }
 }))
 
@@ -32,6 +39,7 @@ const monthDays = () => {
   const days = []
   const dateStart = moment(refDate, 'YYYY-MM-DD')
   const dateEnd = moment(refDate, 'YYYY-MM-DD').add(moment().daysInMonth(), 'days')
+
   while (dateEnd.diff(dateStart, 'days') > 0) {
     days.push(dateStart.format('D'))
     dateStart.add(1, 'days')
@@ -53,7 +61,7 @@ const Calendar = () => {
               <TableCell></TableCell>
               {
                 days.map(day => (
-                  <TableCell align="center">{day}</TableCell>
+                  <TableCell key={day} align="center">{day}</TableCell>
                 ))
               }
             </TableRow>
@@ -62,12 +70,19 @@ const Calendar = () => {
             {
               workers.results.map(worker =>
                 <TableRow key={worker.id}>
-                  <TableCell component="th" scope="row">
+                  <TableCell className={classes.header} component="th" scope="row" nowrap="nowrap">
                     {`${worker.first_name} ${worker.last_name}`}
                   </TableCell>
                   {
                     days.map(day => (
-                      <TableCell align="center"><Badge badgeContent="" color="secondary" /></TableCell>
+                      <TableCell key={`${worker.id}-${day}`} align="center">
+                        {
+                          [6, 7].includes(moment(refDate, 'YYYY-MM-DD').set('date', day).isoWeekday())
+                            ? <Badge badgeContent="" className={classes.workingDay} />
+                            : <Badge badgeContent="" className={classes.weekendDay} />
+                        }
+
+                      </TableCell>
                     ))
                   }
                 </TableRow>
