@@ -14,8 +14,12 @@ import Zoom from '@material-ui/core/Zoom'
 
 import EditIcon from '@material-ui/icons/Edit'
 import SaveIcon from '@material-ui/icons/Save'
+import DeleteIcon from '@material-ui/icons/Delete'
+import VpnKeyIcon from '@material-ui/icons/VpnKey'
 
 import { makeStyles } from '@material-ui/core/styles'
+
+import { useFetchMember } from '../../services/absences'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -34,14 +38,33 @@ const useStyles = makeStyles((theme) => ({
 
 const MemberForm = (props) => {
   const classes = useStyles()
-  const { member } = props
+  const { memberId } = props
   const [editable, setEditable] = useState(false)
+  const [{ member, loading, error }, fetchMember] = useFetchMember()
+
+  useEffect(() => {
+    fetchMember(memberId)
+  }, [memberId])
+
+  const initialMember = {
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    username: '',
+    holidays: '',
+    contract_date: '',
+    working_week: '',
+    vacation_policy: '',
+    gender: '',
+    category: ''
+  }
 
   return (
     <>
       <Formik
         enableReinitialize={true}
-        initialValues={ member }
+        initialValues={{ ...initialMember, ...member }}
         validationSchema={
           Yup.object().shape(
             {
@@ -80,7 +103,7 @@ const MemberForm = (props) => {
                   margin="normal"
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  value={values?.first_name}
+                  value={values?.first_name || ''}
                   error={errors.first_name && touched.first_name}
                   helperText={touched.first_name && errors.first_name}
                   disabled={!editable}
@@ -234,14 +257,18 @@ const MemberForm = (props) => {
                 <Button
                   className={classes.button}
                   variant="outlined"
+                  startIcon={<VpnKeyIcon />}
+                  disabled={!editable}
                 >
-                  Eliminar
+                  Canviar password
                 </Button>
                 <Button
                   className={classes.button}
                   variant="outlined"
+                  startIcon={<DeleteIcon />}
+                  disabled={!editable}
                 >
-                  Canviar password
+                  Eliminar
                 </Button>
               </Grid>
             </Grid>

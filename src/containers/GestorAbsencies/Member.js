@@ -39,21 +39,14 @@ const useStyles = makeStyles((theme) => ({
 
 const Member = (props) => {
   const classes = useStyles()
-  const [editable, setEditable] = useState(false)
-  const [{ member, loading, error }, fetchMember] = useFetchMember()
   const { user } = useAuthState()
-
-  useEffect(() => {
-    const { user_id } = user
-    fetchMember(user_id)
-  }, [user])
 
   return (
     <>
       <Card className={classes.paper} elevation={0}>
         <CardHeader title="El meu perfil" />
         <CardContent>
-          <MemberForm member={member} />
+          <MemberForm memberId={user?.user_id} />
         </CardContent>
       </Card>
     </>

@@ -12,6 +12,7 @@ import Zoom from '@material-ui/core/Zoom'
 import { makeStyles } from '@material-ui/core/styles'
 import EditMenu from '../../components/EditMenu'
 import ModalForm from '../../components/ModalForm'
+import MemberForm from './MemberForm'
 
 import { useFetchMembers, useFetchTeams } from '../../services/absences'
 
@@ -34,7 +35,9 @@ const useStyles = makeStyles((theme) => ({
 
 const ET = () => {
   const classes = useStyles()
+
   const [activeTab, setActiveTab] = useState(0)
+
   const [{ members, loadingMembers, errorMembers }, fetchMembers] = useFetchMembers()
   const [{ teams, loadingTeams, errorTeams }, fetchTeams] = useFetchTeams()
 
@@ -55,6 +58,7 @@ const ET = () => {
   const MembersList = () => {
 
     const [open, setOpen] = useState(false)
+    const [memberId, setMemberId] = useState()
 
     const handleAccept = () => {
       setOpen(false)
@@ -63,7 +67,6 @@ const ET = () => {
     const handleClose = () => {
       setOpen(false)
     }
-
 
     return (
       <>
@@ -80,7 +83,7 @@ const ET = () => {
                       </Avatar>
                     }
                     action={
-                      <EditMenu onEdit={ () => setOpen(true) } />
+                      <EditMenu onEdit={ () => { setOpen(true); setMemberId(member.id) } } />
                     }
                     title={ `${member.first_name} ${member.last_name}` }
                     subheader={member.email}
@@ -91,18 +94,21 @@ const ET = () => {
           ))
         }
         <ModalForm
-          title={'Edit member'}
-          content={<div>foo</div>}
+          title={'Editar membre'}
           open={open}
+          showControls={false}
           onAccept={handleAccept}
           onClose={handleClose}
-        />
+        >
+          <MemberForm memberId={memberId} />
+        </ModalForm>
       </>
     )
   }
 
   const TeamsList = () => {
     const [open, setOpen] = useState(false)
+    const [teamId, setTeamId] = useState()
 
     const handleAccept = () => {
       setOpen(false)
@@ -127,7 +133,7 @@ const ET = () => {
                       </Avatar>
                     }
                     action={
-                      <EditMenu onEdit={ () => setOpen(true) } />
+                      <EditMenu onEdit={ () => setTeamId(team.id) & setOpen(true) } />
                     }
                     title={ `${team.name}` }
                     subheader={''}
@@ -138,12 +144,14 @@ const ET = () => {
           ))
         }
         <ModalForm
-          title={'Edit team'}
-          content={<div>foo</div>}
+          title={'Editar equip'}
           open={open}
+          showControls={false}
           onAccept={handleAccept}
           onClose={handleClose}
-        />
+        >
+          <div></div>
+        </ModalForm>
       </>
     )
   }

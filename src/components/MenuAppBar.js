@@ -9,7 +9,11 @@ import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import MenuItem from '@material-ui/core/MenuItem'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
 import Menu from '@material-ui/core/Menu'
+
+import ExitToAppIcon from '@material-ui/icons/ExitToApp'
+import PersonIcon from '@material-ui/icons/Person'
 
 import { useAuthState } from '../context/auth'
 
@@ -107,8 +111,12 @@ const MenuAppBar = () => {
                 open={open}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleProfile}>Profile</MenuItem>
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                <MenuItem onClick={handleProfile}>
+                  <ListItemIcon><PersonIcon /></ListItemIcon>Profile
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>
+                  <ListItemIcon><ExitToAppIcon /></ListItemIcon>Logout
+                </MenuItem>
               </Menu>
             </div>
           )}

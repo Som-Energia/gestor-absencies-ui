@@ -10,7 +10,7 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 
 const ModalForm = (props) => {
   const { t } = useTranslation()
-  const { open, onClose, onAccept, title, content } = props
+  const { open, onClose, onAccept, title, showControls = true, children } = props
   const descriptionElementRef = useRef(null)
 
   useEffect(() => {
@@ -37,18 +37,21 @@ const ModalForm = (props) => {
             id="scroll-dialog-description"
             ref={descriptionElementRef}
             tabIndex={-1}
-            dangerouslySetInnerHTML={{ __html: content }}
           >
+            {children}
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button data-cy="decline" onClick={onClose}>
-            {t('I_DECLINE')}
-          </Button>
-          <Button data-cy="accept" onClick={onAccept} variant="contained" color="primary">
-            {t('I_ACCEPT')}
-          </Button>
-        </DialogActions>
+        {
+          showControls &&
+          <DialogActions>
+            <Button data-cy="decline" onClick={onClose}>
+              {t('I_DECLINE')}
+            </Button>
+            <Button data-cy="accept" onClick={onAccept} variant="contained" color="primary">
+              {t('I_ACCEPT')}
+            </Button>
+          </DialogActions>
+        }
       </Dialog>
     </>
   )

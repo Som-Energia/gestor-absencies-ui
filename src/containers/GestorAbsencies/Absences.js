@@ -4,22 +4,24 @@ import clsx from 'clsx'
 
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
+import Fab from '@material-ui/core/Fab'
 import Grid from '@material-ui/core/Grid'
+import IconButton from '@material-ui/core/IconButton'
 import Paper from '@material-ui/core/Paper'
 import Zoom from '@material-ui/core/Zoom'
 
 import { makeStyles } from '@material-ui/core/styles'
 
+import AddIcon from '@material-ui/icons/Add'
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos'
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
-import IconButton from '@material-ui/core/IconButton'
-import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 import { useAuthState } from '../../context/auth'
 import { useFetch, useFetchAbsencesType, useFetchMember } from '../../services/absences'
 
 import AbsAnualCalendar from '../../components/AbsAnualCalendar'
+import EditMenu from '../../components/EditMenu'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -122,6 +124,11 @@ const useStyles = makeStyles((theme) => ({
       fontSize: '16px',
       lineHeight: '25px'
     }
+  },
+  fab: {
+    position: 'absolute',
+    bottom: theme.spacing(2),
+    right: theme.spacing(2)
   }
 }))
 
@@ -175,9 +182,7 @@ const AbsencePeriod = (props) => {
           &nbsp;dies
         </div>
       </div>
-      <IconButton aria-label="actions">
-        <MoreVertIcon />
-      </IconButton>
+      <EditMenu onEdit={ () => console.log('edit!') } />
     </div>
   )
 }
@@ -218,7 +223,7 @@ const Absences = () => {
           {
             data?.results && types?.results &&
               data?.results.map((absence, index) => (
-                <Zoom in={true}>
+                <Zoom key={index} in={true}>
                   <Card className={clsx(classes.paper, !index && classes.noMarginTop)} elevation={0}>
                     <CardContent className={classes.contentItem}>
                       <AbsencePeriod absence={absence} types={types?.results} />
@@ -255,6 +260,16 @@ const Absences = () => {
           </Card>
         </Grid>
       </Grid>
+      <Zoom in={true} disableStrictModeCompat={true}>
+        <Fab
+          color="primary"
+          aria-label="edit"
+          className={classes.fab}
+          onClick={() => console.log('add')}
+        >
+          <AddIcon />
+        </Fab>
+      </Zoom>
     </>
   )
 }
