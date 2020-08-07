@@ -20,8 +20,8 @@
 - [ ] Link a formulari de crear absència
 - [ ] API requests
 ### El meu perfil -- member
-- [ ] Boto ELIMINAR i CANVI PASSWORD només si s'està editant
-- [ ] Visualització dels camps
+- [x] Boto ELIMINAR i CANVI PASSWORD només si s'està editant
+- [x] Visualització dels camps
 - [ ] API requests
 - [ ] Boto ELIMINAR
 - [ ] Boto CANVI PASSWORD
