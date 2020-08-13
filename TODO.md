@@ -34,7 +34,7 @@
 - [ ] Pintar les absències
 - [ ] Marcar el dia actual
 - [ ] API requests
-### ET --> Usuaris
+### ET --> Usuaris: R57
 - [ ] Boto ADD NEW MEMBER
 - [ ] Filtre
 - [x] Parlar estructura amb Vid
