@@ -1,26 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 
-import { Formik } from 'formik'
-import * as Yup from 'yup'
-
-import Button from '@material-ui/core/Button'
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
-import Fab from '@material-ui/core/Fab'
-import Grid from '@material-ui/core/Grid'
-import TextField from '@material-ui/core/TextField'
-import Zoom from '@material-ui/core/Zoom'
-
-import EditIcon from '@material-ui/icons/Edit'
-import SaveIcon from '@material-ui/icons/Save'
 
 import MemberForm from './MemberForm'
 
 import { makeStyles } from '@material-ui/core/styles'
 
 import { useAuthState } from '../../context/auth'
-import { useFetchMember } from '../../services/absences'
 
 const useStyles = makeStyles((theme) => ({
   paper: {

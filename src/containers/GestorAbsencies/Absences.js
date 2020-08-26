@@ -19,9 +19,13 @@ import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
 
 import { useAuthState } from '../../context/auth'
 import { useFetch, useFetchAbsencesType, useFetchMember } from '../../services/absences'
+import { HOLIDAYS_ABSENCE_TYPE, countAbsencesType } from '../../services/utils'
 
 import AbsAnualCalendar from '../../components/AbsAnualCalendar'
 import EditMenu from '../../components/EditMenu'
+import ModalForm from '../../components/ModalForm'
+
+import AbsenceForm from './AbsenceForm'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -76,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: 'hidden'
   },
   itemMonth: {
-    fontSize: '14px',
+    fontSize: '12px',
     height: '20px',
     lineHeight: '20px',
     background: theme.palette.primary.main,
@@ -85,9 +89,9 @@ const useStyles = makeStyles((theme) => ({
     textTransform: 'uppercase'
   },
   itemDay: {
-    fontSize: '24px',
+    fontSize: '22px',
     height: '28px',
-    lineHeight: '36px',
+    lineHeight: '34px',
     color: '#1c242b',
     fontWeight: '400'
   },
@@ -97,7 +101,7 @@ const useStyles = makeStyles((theme) => ({
     textTransform: 'uppercase'
   },
   timeSeparator: {
-    margin: '0 4px',
+    margin: '0 8px',
     color: 'rgba(0, 0, 0, 0.5)'
   },
   itemContent: {
@@ -113,7 +117,6 @@ const useStyles = makeStyles((theme) => ({
       whiteSpace: 'nowrap',
       fontSize: '16px',
       lineHeight: '25px',
-      textTransform: 'uppercase',
       margin: 0
     },
     '& div': {
@@ -121,8 +124,8 @@ const useStyles = makeStyles((theme) => ({
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
-      fontSize: '16px',
-      lineHeight: '25px'
+      fontSize: '13px',
+      lineHeight: '16px'
     }
   },
   fab: {
@@ -137,6 +140,7 @@ const AbsencePeriod = (props) => {
   const { absence, types } = props
   const { start_time, end_time, absence_type } = absence
 
+  const duration = moment(end_time).diff(moment(start_time), 'd') + 1
   const absenceType = types.filter(({ id }) => id === absence_type)[0]?.name
 
   return (
@@ -176,10 +180,7 @@ const AbsencePeriod = (props) => {
             <h5>{ absenceType }</h5>
         }
         <div>
-          {
-            Math.round(moment.duration(moment(end_time).diff(moment(start_time))).asDays())
-          }
-          &nbsp;dies
+          { duration }&nbsp;{ duration > 1 ? 'dies' : 'dia' }
         </div>
       </div>
       <EditMenu onEdit={ () => console.log('edit!') } />
@@ -190,31 +191,57 @@ const AbsencePeriod = (props) => {
 const Absences = () => {
   const classes = useStyles()
   const [year, setYear] = useState('2020')
+  const [open, setOpen] = useState(false)
+  const [totalAbsences, setTotalAbsences] = useState('-')
+  const [totalHolidays, setTotalHolidays] = useState('-')
+
+  const nextYear = () => {
+    const next = year + 1
+    next <= moment().year() + 1 && setYear(next)
+  }
+
+  const prevYear = () => {
+    const prev = year - 1
+    prev >= moment().year() - 5 && setYear(prev)
+  }
+
+  const handleAccept = () => {
+    setOpen(false)
+    fetch(`/absencies/absences?worker=${user_id}&start_period=${year}-01-01&end_period=${year}-12-31`)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+  }
 
   const { user } = useAuthState()
+  const { user_id } = user
 
   const [{ data, loading, error }, fetch] = useFetch()
   const [{ types, loadingTypes, errorTypes }, fetchTypes] = useFetchAbsencesType()
   const [{ member, loadingMember, errorMember }, fetchMember] = useFetchMember()
 
   useEffect(() => {
-    fetch(`/absencies/absences?worker=${user.user_id}&start_period=${year}-01-01&end_period=${year}-12-31`)
+    fetch(`/absencies/absences?worker=${user_id}&start_period=${year}-01-01&end_period=${year}-12-31`)
     fetchTypes()
-    fetchMember(user.user_id)
-  }, [year, user])
+    fetchMember(user_id)
+  }, [year, user_id])
 
-  console.log(data)
+  useEffect(() => {
+    data?.results && setTotalHolidays(countAbsencesType(data?.results, HOLIDAYS_ABSENCE_TYPE))
+    data?.results && setTotalAbsences(countAbsencesType(data?.results))
+  }, [data])
 
   return (
     <>
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <Paper className={classes.yearContainer} elevation={0}>
-            <IconButton aria-label="prev year">
+            <IconButton aria-label="previous year" onClick={prevYear}>
               <ArrowBackIosIcon />
             </IconButton>
             <h1>{year}</h1>
-            <IconButton aria-label="next year">
+            <IconButton aria-label="next year" onClick={nextYear}>
               <ArrowForwardIosIcon />
             </IconButton>
           </Paper>
@@ -238,7 +265,7 @@ const Absences = () => {
             <CardContent>
               <div className={classes.resum}>
                 <div className={classes.resumItem}>
-                  <div className={classes.super}>{ '-' }</div>
+                  <div className={classes.super}>{totalAbsences}</div>
                   <div className={classes.superDesc}>DIES TOTALS</div>
                 </div>
                 <div className={classes.resumItem}>
@@ -246,7 +273,7 @@ const Absences = () => {
                   <div className={classes.superDesc}>DIES DISPONIBLES</div>
                 </div>
                 <div className={classes.resumItem}>
-                  <div className={classes.super}>9.5</div>
+                  <div className={classes.super}>{totalHolidays}</div>
                   <div className={classes.superDesc}>DIES UTILITZATS</div>
                 </div>
               </div>
@@ -255,17 +282,26 @@ const Absences = () => {
 
           <Card className={classes.paper} elevation={0}>
             <CardContent>
-              <AbsAnualCalendar />
+              <AbsAnualCalendar year={year} absences={data?.results} types={types?.results} />
             </CardContent>
           </Card>
         </Grid>
       </Grid>
+      <ModalForm
+        title={'Nova absència'}
+        open={open}
+        showControls={false}
+        onAccept={handleAccept}
+        onClose={handleClose}
+      >
+        <AbsenceForm absenceId={0} workerId={user_id} onSucces={handleAccept} />
+      </ModalForm>
       <Zoom in={true} disableStrictModeCompat={true}>
         <Fab
           color="primary"
           aria-label="edit"
           className={classes.fab}
-          onClick={() => console.log('add')}
+          onClick={() => setOpen(true) }
         >
           <AddIcon />
         </Fab>

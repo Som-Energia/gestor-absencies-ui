@@ -1,26 +1,15 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
 
 const ModalForm = (props) => {
   const { t } = useTranslation()
-  const { open, onClose, onAccept, title, showControls = true, children } = props
-  const descriptionElementRef = useRef(null)
-
-  useEffect(() => {
-    if (open) {
-      const { current: descriptionElement } = descriptionElementRef
-      if (descriptionElement !== null) {
-        descriptionElement.focus()
-      }
-    }
-  }, [open])
+  const { open, onClose, onAccept, title, showControls = true, children, maxWidth='sm' } = props
 
   return (
     <>
@@ -28,18 +17,13 @@ const ModalForm = (props) => {
         open={open}
         onClose={onClose}
         scroll="paper"
+        maxWidth={maxWidth}
         aria-labelledby="scroll-dialog-title"
         aria-describedby="scroll-dialog-description"
       >
         <DialogTitle id="scroll-dialog-title">{title}</DialogTitle>
         <DialogContent dividers={true}>
-          <DialogContentText
-            id="scroll-dialog-description"
-            ref={descriptionElementRef}
-            tabIndex={-1}
-          >
-            {children}
-          </DialogContentText>
+          {children}
         </DialogContent>
         {
           showControls &&

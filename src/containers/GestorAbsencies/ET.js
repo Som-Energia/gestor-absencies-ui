@@ -96,6 +96,7 @@ const ET = () => {
         <ModalForm
           title={'Editar membre'}
           open={open}
+          maxWidth="md"
           showControls={false}
           onAccept={handleAccept}
           onClose={handleClose}
@@ -147,6 +148,7 @@ const ET = () => {
           title={'Editar equip'}
           open={open}
           showControls={false}
+          maxWidth="md"
           onAccept={handleAccept}
           onClose={handleClose}
         >

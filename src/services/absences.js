@@ -165,3 +165,40 @@ export const useFetchAbsencesType = () => {
 
   return [{ types, loading, error }, load]
 }
+
+
+export const usePostAbsence = () => {
+  const [response, setResponse] = useState()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
+
+  const { user } = useAuthState()
+
+  const init = () => {
+    setResponse(null)
+    setLoading(false)
+    setError(false)
+  }
+
+  const postAbsence = async (data) => {
+    init()
+    setLoading(true)
+    try {
+      const result = await axios({
+        method: 'POST',
+        url: `${API_URL}/absencies/absences`,
+        data: data,
+        headers: {
+          Authorization: `JWT ${user?.token}`
+        }
+      })
+      setResponse(result?.data)
+    } catch (e) {
+      setResponse(null)
+      setError(true)
+    }
+    setLoading(false)
+  }
+
+  return [{ response, loading, error }, postAbsence]
+}

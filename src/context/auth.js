@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import moment from 'moment'
 
 import { loginService } from '../services/authentication'
 
@@ -12,16 +13,20 @@ const AuthProvider = (props) => {
   })
 
   React.useEffect(() => {
-    const user = localStorage.getItem('somAuthUser')
+    let user = localStorage.getItem('somAuthUser')
     if (user) {
-      setState({ status: 'success', error: null, user: JSON.parse(user) })
+      user = JSON.parse(user)
+      if (user?.lastRefresh) {
+        const lastRefreshDiff = moment().diff(moment(user?.lastRefresh), 'h')
+        lastRefreshDiff < 24 && setState({ status: 'success', error: null, user: user })
+      }
     }
   }, [])
 
   const login = async (username, password) => {
     return loginService(username, password)
       .then(response => {
-        response.data.lastRefresh = new Date().toString()
+        response.data.lastRefresh = moment().toString()
         // TODO: Only remember if checkbox was checked
         localStorage.setItem('somAuthUser', JSON.stringify(response.data))
         setState({ status: 'success', error: null, user: response.data })

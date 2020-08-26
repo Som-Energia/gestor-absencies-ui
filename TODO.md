@@ -1,5 +1,7 @@
 # Gestor d'Absències migration to React
 
+- [ ] Implementar traduccions i18next
+
 ## Falten les pantalles per implementar:
 - [ ] "Som Energia" --> Tipus d'absències
 - [ ] "Som Energia" --> Politiques de vacances
@@ -11,13 +13,13 @@
 
 ## TODO's pantalles ja estructurades:
 ### Absències:
-- [ ] Poder canviar d'any
-- [ ] Pintar els dies totals
-- [ ] Veure el dia que és amb el calendari passant el mouse per sobre
-- [ ] Marcar les absències en el calendari
+- [x] Poder canviar d'any
+- [x] Pintar els dies totals
+- [x] Veure el dia que és amb el calendari passant el mouse per sobre
+- [x] Marcar les absències en el calendari
 - [ ] Contar bé els dies computables
 - [ ] Poder eliminar una absència
-- [ ] Link a formulari de crear absència
+- [x] Link a formulari de crear absència
 - [ ] API requests
 ### El meu perfil -- member
 - [x] Boto ELIMINAR i CANVI PASSWORD només si s'està editant
