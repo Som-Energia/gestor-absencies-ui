@@ -24,13 +24,14 @@ export const useFetch = () => {
     setLoading(true)
     try {
       const result = await axios.get(`${API_URL}${endPoint}`, {
+        timeout: 10000,
         headers: {
           Authorization: `JWT ${user?.token}`
         }
       })
       setData(result?.data)
     } catch (e) {
-      setError(true)
+      setError('No s\'han pogut obtenir les dades')
     }
     setLoading(false)
   }
@@ -72,8 +73,8 @@ export const useFetchMember = () => {
 
 export const useFetchMembers = () => {
   const [members, setMembers] = useState({})
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
+  const [loadingMembers, setLoading] = useState(false)
+  const [errorMembers, setError] = useState(false)
 
   const { user } = useAuthState()
 
@@ -88,24 +89,25 @@ export const useFetchMembers = () => {
     setLoading(true)
     try {
       const result = await axios.get(`${API_URL}/absencies/workers`, {
+        timeout: 10000,
         headers: {
           Authorization: `JWT ${user?.token}`
         }
       })
       setMembers(result?.data)
     } catch (e) {
-      setError(true)
+      setError('No s\'han pogut obtenir les dades')
     }
     setLoading(false)
   }
 
-  return [{ members, loading, error }, load]
+  return [{ members, loadingMembers, errorMembers, setMembers }, load]
 }
 
 export const useFetchTeams = () => {
   const [teams, setTeams] = useState({})
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
+  const [loadingTeams, setLoading] = useState(false)
+  const [errorTeams, setError] = useState(false)
 
   const { user } = useAuthState()
 
@@ -120,18 +122,19 @@ export const useFetchTeams = () => {
     setLoading(true)
     try {
       const result = await axios.get(`${API_URL}/absencies/teams`, {
+        timeout: 10000,
         headers: {
           Authorization: `JWT ${user?.token}`
         }
       })
       setTeams(result?.data)
     } catch (e) {
-      setError(true)
+      setError('No s\'han pogut obtenir les dades')
     }
     setLoading(false)
   }
 
-  return [{ teams, loading, error }, load]
+  return [{ teams, loadingTeams, errorTeams, setTeams }, load]
 }
 
 export const useFetchAbsencesType = () => {
@@ -166,6 +169,107 @@ export const useFetchAbsencesType = () => {
   return [{ types, loading, error }, load]
 }
 
+export const useFetchVacationPolicy = () => {
+  const [vacationPolicy, setVacationPolicy] = useState({})
+  const [loadingVacationPolicy, setLoading] = useState(false)
+  const [errorVacationPolicy, setError] = useState(false)
+
+  const { user } = useAuthState()
+
+  const init = () => {
+    setVacationPolicy({})
+    setLoading(false)
+    setError(false)
+  }
+
+  const loadVacationPolicy = async () => {
+    init()
+    setLoading(true)
+    try {
+      const result = await axios.get(`${API_URL}/absencies/vacationpolicy`, {
+        headers: {
+          Authorization: `JWT ${user?.token}`
+        }
+      })
+      setVacationPolicy(result?.data)
+    } catch (e) {
+      setError('Error obtenint les polítiques de vacances')
+    }
+    setLoading(false)
+  }
+
+  return [{ vacationPolicy, loadingVacationPolicy, errorVacationPolicy }, loadVacationPolicy]
+}
+
+export const useFetchCategories = () => {
+  const [categories, setCategories] = useState({})
+  const [loadingCategories, setLoading] = useState(false)
+  const [errorCategories, setError] = useState(false)
+
+  const categoriesMock = {
+    results: [
+      { id: 'Technical', name: 'Tècnic' },
+      { id: 'Specialist', name: 'Especialista' },
+      { id: 'Manager', name: 'Gerència' },
+      { id: 'admin', name: 'Administrador' }
+    ]
+  }
+
+  const init = () => {
+    setCategories({})
+    setLoading(false)
+    setError(false)
+  }
+
+  const loadCategories = async () => {
+    init()
+    setLoading(true)
+    try {
+      setCategories(categoriesMock)
+    } catch (e) {
+      setError('Error obtenint les categories')
+    }
+    setLoading(false)
+  }
+
+  return [{ categories, loadingCategories, errorCategories }, loadCategories]
+}
+
+export const useFetchGender = () => {
+  const [gender, setGender] = useState({})
+  const [loadingGender, setLoading] = useState(false)
+  const [errorGender, setError] = useState(false)
+
+  const genderMock = {
+    results: [
+      { id: 'Female', name: 'Dona' },
+      { id: 'Male', name: 'Home' },
+      { id: 'Intersex', name: 'Intersex' },
+      { id: 'Trans', name: 'Trans' },
+      { id: 'Queer', name: 'Queer' },
+      { id: 'Other', name: 'Altre' }
+    ]
+  }
+
+  const init = () => {
+    setGender({})
+    setLoading(false)
+    setError(false)
+  }
+
+  const loadGender = async () => {
+    init()
+    setLoading(true)
+    try {
+      setGender(genderMock)
+    } catch (e) {
+      setError('Error obtenint els gèneres')
+    }
+    setLoading(false)
+  }
+
+  return [{ gender, loadingGender, errorGender }, loadGender]
+}
 
 export const usePostAbsence = () => {
   const [response, setResponse] = useState()
@@ -201,4 +305,40 @@ export const usePostAbsence = () => {
   }
 
   return [{ response, loading, error }, postAbsence]
+}
+
+export const usePostWorker = () => {
+  const [response, setResponse] = useState()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
+
+  const { user } = useAuthState()
+
+  const init = () => {
+    setResponse(null)
+    setLoading(false)
+    setError(false)
+  }
+
+  const post = async (data) => {
+    init()
+    setLoading(true)
+    try {
+      const result = await axios({
+        method: data.id === 0 ? 'POST' : 'PUT',
+        url: `${API_URL}/absencies/workers/${data.id === 0 ? '' : data.id}`,
+        data: data,
+        headers: {
+          Authorization: `JWT ${user?.token}`
+        }
+      })
+      setResponse(result?.data)
+    } catch (e) {
+      setResponse(null)
+      setError(true)
+    }
+    setLoading(false)
+  }
+
+  return [{ response, loading, error }, post]
 }

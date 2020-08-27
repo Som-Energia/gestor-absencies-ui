@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react'
 
-import Avatar from '@material-ui/core/Avatar'
-import Card from '@material-ui/core/Card'
-import CardHeader from '@material-ui/core/CardHeader'
+import Alert from '@material-ui/lab/Alert'
+import Fab from '@material-ui/core/Fab'
 import Grid from '@material-ui/core/Grid'
+import IconButton from '@material-ui/core/IconButton'
 import Paper from '@material-ui/core/Paper'
+import Snackbar from '@material-ui/core/Snackbar'
 import Tab from '@material-ui/core/Tab'
 import Tabs from '@material-ui/core/Tabs'
+import TextField from '@material-ui/core/TextField'
 import Zoom from '@material-ui/core/Zoom'
 
 import { makeStyles } from '@material-ui/core/styles'
-import EditMenu from '../../components/EditMenu'
 import ModalForm from '../../components/ModalForm'
+import MembersList from '../../components/MembersList'
+import TeamsList from '../../components/TeamsList'
+import SkeletonList from '../../components/SkeletonList'
 import MemberForm from './MemberForm'
+
+import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined'
+import SearchIcon from '@material-ui/icons/Search'
 
 import { useFetchMembers, useFetchTeams } from '../../services/absences'
 
@@ -30,6 +37,14 @@ const useStyles = makeStyles((theme) => ({
   },
   listItem: {
     padding: '8px 0 8px 8px'
+  },
+  fab: {
+    position: 'absolute',
+    bottom: theme.spacing(2),
+    right: theme.spacing(2)
+  },
+  filter: {
+    textAlign: 'right'
   }
 }))
 
@@ -37,28 +52,59 @@ const ET = () => {
   const classes = useStyles()
 
   const [activeTab, setActiveTab] = useState(0)
+  const [filter, setFilter] = useState('')
+
+  const [filteredMembers, setFilteredMembers] = useState([])
+  const [filteredTeams, setFilteredTeams] = useState([])
 
   const [{ members, loadingMembers, errorMembers }, fetchMembers] = useFetchMembers()
   const [{ teams, loadingTeams, errorTeams }, fetchTeams] = useFetchTeams()
 
   useEffect(() => {
     if (activeTab === 0) {
+      setFilter('')
       fetchMembers()
     }
     if (activeTab === 1) {
+      setFilter('')
       fetchTeams()
     }
   }, [activeTab])
+
+  useEffect(() => {
+    const exp = new RegExp(filter, 'i')
+    if (activeTab === 0 && members?.results) {
+      const filtered = members.results.filter(member => member.first_name.match(exp) || member.last_name.match(exp) || member.email.match(exp))
+      setFilteredMembers(filtered)
+    }
+    if (activeTab === 0 && teams?.results) {
+      const filtered = teams.results.filter(team => team.name.match(exp))
+      setFilteredTeams(filtered)
+    }
+  }, [filter])
 
   const handleChange = (event, newValue) => {
     event.preventDefault()
     setActiveTab(newValue)
   }
 
-  const MembersList = () => {
+  const handleFilter = (event) => {
+    setFilter(event.target.value)
+  }
 
+  const MembersListTab = () => {
     const [open, setOpen] = useState(false)
     const [memberId, setMemberId] = useState()
+
+    const handleClick = () => {
+      setMemberId(false)
+      setOpen(true)
+    }
+
+    const handleEdit = (memberId) => {
+      setOpen(true)
+      setMemberId(memberId)
+    }
 
     const handleAccept = () => {
       setOpen(false)
@@ -71,43 +117,45 @@ const ET = () => {
     return (
       <>
         {
-        members?.results &&
-          members.results.map(member => (
-            <Grid key={member.id} className={classes.listItem} item xs={12} sm={4}>
-              <Zoom in={activeTab === 0}>
-                <Card className={classes.card} elevation={0}>
-                  <CardHeader
-                    avatar={
-                      <Avatar aria-label="member" className={classes.avatar}>
-                        { member.first_name.charAt(0).toUpperCase() }
-                      </Avatar>
-                    }
-                    action={
-                      <EditMenu onEdit={ () => { setOpen(true); setMemberId(member.id) } } />
-                    }
-                    title={ `${member.first_name} ${member.last_name}` }
-                    subheader={member.email}
-                  />
-                </Card>
-              </Zoom>
-            </Grid>
-          ))
+          members?.results
+            ? <MembersList
+              members={filter !== '' ? filteredMembers : members.results}
+              onEdit={handleEdit}
+            />
+            : loadingMembers
+              ? <SkeletonList numItems={15} />
+              : <></>
         }
         <ModalForm
-          title={'Editar membre'}
+          title={ memberId ? 'Editar membre' : 'Afegir membre'}
           open={open}
-          maxWidth="md"
-          showControls={false}
           onAccept={handleAccept}
           onClose={handleClose}
+          maxWidth="md"
+          showControls={false}
         >
-          <MemberForm memberId={memberId} />
+          <MemberForm memberId={memberId} onSuccess={handleAccept} onError={() => {}} />
         </ModalForm>
+        <Zoom in={true} disableStrictModeCompat={true}>
+          <Fab
+            color="primary"
+            aria-label="edit"
+            className={classes.fab}
+            onClick={handleClick}
+          >
+            <PersonAddOutlinedIcon />
+          </Fab>
+        </Zoom>
+        <Snackbar open={ !!errorMembers }>
+          <Alert severity="error">
+            { errorMembers }
+          </Alert>
+        </Snackbar>
       </>
     )
   }
 
-  const TeamsList = () => {
+  const TeamsListTab = () => {
     const [open, setOpen] = useState(false)
     const [teamId, setTeamId] = useState()
 
@@ -119,41 +167,45 @@ const ET = () => {
       setOpen(false)
     }
 
+    const handleEdit = (teamId) => {
+      setOpen(true)
+      setTeamId(teamId)
+    }
+
     return (
       <>
         {
-        teams?.results &&
-          teams.results.map(team => (
-            <Grid key={team.id} className={classes.listItem} item xs={12} sm={4}>
-              <Zoom in={activeTab === 1}>
-                <Card className={classes.card} elevation={0}>
-                  <CardHeader
-                    avatar={
-                      <Avatar aria-label="member" className={classes.avatar}>
-                        { team.name.charAt(0).toUpperCase() }
-                      </Avatar>
-                    }
-                    action={
-                      <EditMenu onEdit={ () => setTeamId(team.id) & setOpen(true) } />
-                    }
-                    title={ `${team.name}` }
-                    subheader={''}
-                  />
-                </Card>
-              </Zoom>
-            </Grid>
-          ))
+          teams?.results
+            ? <TeamsList teams={filteredTeams ? filteredTeams : teams.results} onEdit={handleEdit} />
+            : loadingTeams
+              ? <SkeletonList numItems={15} />
+              : <></>
         }
         <ModalForm
-          title={'Editar equip'}
+          title={ teamId ? 'Editar equip' : 'Afegir equip'}
           open={open}
           showControls={false}
-          maxWidth="md"
           onAccept={handleAccept}
           onClose={handleClose}
+          maxWidth="md"
         >
           <div></div>
         </ModalForm>
+        <Zoom in={true} disableStrictModeCompat={true}>
+          <Fab
+            color="primary"
+            aria-label="edit"
+            className={classes.fab}
+            onClick={ console.log('add!') }
+          >
+            <PersonAddOutlinedIcon />
+          </Fab>
+        </Zoom>
+        <Snackbar open={ !!errorTeams }>
+          <Alert severity="error">
+            { errorTeams }
+          </Alert>
+        </Snackbar>
       </>
     )
   }
@@ -161,23 +213,38 @@ const ET = () => {
   return (
     <>
       <Paper className={classes.paperTabs} elevation={0}>
-        <Tabs
-          value={activeTab}
-          onChange={handleChange}
-          aria-label="disabled tabs example"
-        >
-          <Tab label="Membres" />
-          <Tab label="Equips" />
-        </Tabs>
+        <Grid container>
+          <Grid item xs={8}>
+            <Tabs
+              value={activeTab}
+              onChange={handleChange}
+              aria-label="disabled tabs example"
+            >
+              <Tab label="Membres" />
+              <Tab label="Equips" />
+            </Tabs>
+          </Grid>
+          <Grid item xs={4} className={classes.filter}>
+            <TextField
+              label=""
+              margin="none"
+              onChange={handleFilter}
+              value={filter}
+              InputProps={{
+                startAdornment: <IconButton><SearchIcon /></IconButton>
+              }}
+            />
+          </Grid>
+        </Grid>
       </Paper>
       <Grid className={classes.list} container>
         {
           activeTab === 0 &&
-            <MembersList />
+            <MembersListTab />
         }
         {
           activeTab === 1 &&
-            <TeamsList />
+            <TeamsListTab />
         }
       </Grid>
     </>

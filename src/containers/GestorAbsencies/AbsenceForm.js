@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
 
 const AbsenceForm = (props) => {
   const classes = useStyles()
-  const { absenceId, workerId, onSucces } = props
+  const { absenceId, workerId, onSucces, onError } = props
   const [editable, setEditable] = useState(true)
 
   const [{ types, loadingTypes, errorTypes }, fetchTypes] = useFetchAbsencesType()

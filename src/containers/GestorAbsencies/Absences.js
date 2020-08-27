@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 import clsx from 'clsx'
 
+import Alert from '@material-ui/lab/Alert'
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
 import Fab from '@material-ui/core/Fab'
 import Grid from '@material-ui/core/Grid'
 import IconButton from '@material-ui/core/IconButton'
 import Paper from '@material-ui/core/Paper'
+import Snackbar from '@material-ui/core/Snackbar'
+import Skeleton from '@material-ui/lab/Skeleton'
 import Zoom from '@material-ui/core/Zoom'
 
 import { makeStyles } from '@material-ui/core/styles'
@@ -141,7 +144,7 @@ const AbsencePeriod = (props) => {
   const { start_time, end_time, absence_type } = absence
 
   const duration = moment(end_time).diff(moment(start_time), 'd') + 1
-  const absenceType = types.filter(({ id }) => id === absence_type)[0]?.name
+  const absenceType = types && types.filter(({ id }) => id === absence_type)[0]?.name
 
   return (
     <div className={classes.item}>
@@ -259,6 +262,21 @@ const Absences = () => {
                 </Zoom>
               ))
           }
+
+          {
+            !data?.results &&
+            [...new Array(7)].map((value, index) => (
+              <Zoom key={index} in={loading}>
+                <Skeleton variant="rect" width="100%">
+                  <Card className={clsx(classes.paper, !index && classes.noMarginTop)} elevation={0}>
+                    <CardContent className={classes.contentItem}>
+                      <AbsencePeriod absence={{}} types={false} />
+                    </CardContent>
+                  </Card>
+                </Skeleton>
+              </Zoom>
+            ))
+          }
         </Grid>
         <Grid item xs={12} sm={7}>
           <Card className={clsx(classes.paper, classes.noMarginTop)} elevation={0}>
@@ -306,6 +324,11 @@ const Absences = () => {
           <AddIcon />
         </Fab>
       </Zoom>
+      <Snackbar open={ !!error || !!errorMember || !!errorTypes }>
+        <Alert severity="error">
+          { error || errorMember || errorTypes }
+        </Alert>
+      </Snackbar>
     </>
   )
 }

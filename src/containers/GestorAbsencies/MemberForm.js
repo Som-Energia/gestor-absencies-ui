@@ -3,12 +3,18 @@ import React, { useState, useEffect } from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 
+import moment from 'moment'
+import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers'
+import MomentUtils from '@date-io/moment'
+import 'moment/locale/ca'
+
 import Button from '@material-ui/core/Button'
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
 import Fab from '@material-ui/core/Fab'
 import Grid from '@material-ui/core/Grid'
+import MenuItem from '@material-ui/core/MenuItem'
 import TextField from '@material-ui/core/TextField'
 import Zoom from '@material-ui/core/Zoom'
 
@@ -19,7 +25,7 @@ import VpnKeyIcon from '@material-ui/icons/VpnKey'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-import { useFetchMember } from '../../services/absences'
+import { useFetchMember, useFetchVacationPolicy, useFetchCategories, useFetchGender, usePostWorker } from '../../services/absences'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -38,15 +44,23 @@ const useStyles = makeStyles((theme) => ({
 
 const MemberForm = (props) => {
   const classes = useStyles()
-  const { memberId } = props
-  const [editable, setEditable] = useState(false)
+  const { memberId, onSuccess, onError } = props
+  const [editable, setEditable] = useState(!memberId)
   const [{ member, loading, error }, fetchMember] = useFetchMember()
+  const [{ vacationPolicy, loadingVacationPolicy, errorVacationPolicy }, loadVacationPolicy] = useFetchVacationPolicy()
+  const [{ gender, loadingGender, errorGender }, loadGender] = useFetchGender()
+  const [{ categories, loadingCategories, errorCategories }, loadCategories] = useFetchCategories()
+  const [{ response, loadingPostWorker, errorPostWorker }, postWorker] = usePostWorker()
 
   useEffect(() => {
-    fetchMember(memberId)
+    memberId && fetchMember(memberId)
+    loadVacationPolicy()
+    loadCategories()
+    loadGender()
   }, [memberId])
 
   const initialMember = {
+    id: 0,
     first_name: '',
     last_name: '',
     email: '',
@@ -61,20 +75,54 @@ const MemberForm = (props) => {
   }
 
   return (
-    <>
+    <MuiPickersUtilsProvider utils={MomentUtils} locale={'ca'}>
       <Formik
         enableReinitialize={true}
+        validateOnMount
+        isInitialValid={false}
         initialValues={{ ...initialMember, ...member }}
         validationSchema={
           Yup.object().shape(
             {
+              id: Yup.number(),
+              first_name: Yup.string()
+                .required('El nom és obligatori'),
+              last_name: Yup.string()
+                .required('Els cognoms són obligatoris'),
               email: Yup.string()
-                .email('El email no és vàlid')
-                .required('El email és obligatori'),
+                .email('L\'email no és vàlid')
+                .required('L\'email és obligatori'),
+              username: Yup.string()
+                .required('L\'usuari és obligatori'),
+              holidays: Yup.number()
+                .required('El numero de dies de vacances és obligatori'),
+              working_week: Yup.number()
+                .required('El numero d\'hores setmanals és obligatori'),
+              vacation_policy: Yup.number()
+                .required('La política de vacances és obligatòria'),
+              gender: Yup.string()
+                .required('El gènere és obligatori'),
+              category: Yup.string()
+                .required('La categoria és obligatòria'),
               password: Yup.string()
-                .required('La password és obligatoria')
-                .min(4, 'La password ha de tenir com a mínim 4 caràcters')
-              // .matches(/(?=.*[0-9])/, 'La contraseña debe tener al menos un número')
+                .when(
+                  'id', {
+                    is: 0,
+                    then: Yup.string().required('La password és obligatòria')
+                      .min(8, 'La password ha de tenir 8 caràcters mínim')
+                      .matches(/[a-zA-Z0-9]/, 'La password només pot contenir lletres i números')
+                  }),
+              repeat_password: Yup.string()
+                .when(
+                  'id', {
+                    is: 0,
+                    then: Yup.string().required('Repetir la password és obligatori')
+                      .test(
+                        'passwordIsEqual',
+                        'Els passwords no són iguals',
+                        function () { return this.parent.password === this.parent.repeat_password }
+                      )
+                  })
             }
           )
         }
@@ -89,7 +137,9 @@ const MemberForm = (props) => {
           handleChange,
           handleBlur,
           handleSubmit,
-          isSubmitting
+          isSubmitting,
+          setFieldValue,
+          isValid
         }) => (
           <form className={classes.form} onSubmit={handleSubmit} noValidate>
             <Grid container spacing={3}>
@@ -157,6 +207,45 @@ const MemberForm = (props) => {
                   disabled={!editable}
                 />
               </Grid>
+              {
+                !memberId &&
+                <>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      required
+                      fullWidth
+                      label="Password"
+                      name="password"
+                      type="password"
+                      variant="outlined"
+                      margin="normal"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values?.password}
+                      error={errors.password && touched.password}
+                      helperText={touched.password && errors.password}
+                      disabled={!editable}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      required
+                      fullWidth
+                      label="Repeteix la password"
+                      name="repeat_password"
+                      type="password"
+                      variant="outlined"
+                      margin="normal"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values?.repeat_password}
+                      error={errors.repeat_password && touched.repeat_password}
+                      helperText={touched.repeat_password && errors.repeat_password}
+                      disabled={!editable}
+                    />
+                  </Grid>
+                </>
+              }
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
@@ -174,26 +263,30 @@ const MemberForm = (props) => {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <DatePicker
                   required
                   fullWidth
-                  label="Data contractació"
-                  name="contract_date"
-                  variant="outlined"
-                  margin="normal"
-                  onChange={handleChange}
+                  variant="inline"
+                  autoOk
+                  inputVariant="outlined"
+                  onChange={event => setFieldValue('contract_date', moment(event).toISOString())}
                   onBlur={handleBlur}
-                  value={values?.contract_date}
-                  error={errors.contract_date && touched.contract_date}
-                  helperText={touched.contract_date && errors.contract_date}
+                  format="DD/MM/YYYY"
+                  disableToolbar
+                  label="Data contractació"
+                  name="values.contract_date"
+                  value={values.contract_date || ''}
+                  error={!!errors.contract_date}
+                  helperText={errors.contract_date}
                   disabled={!editable}
+                  margin="normal"
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
                   fullWidth
-                  label="Hores per setmana"
+                  label="Hores setmanals"
                   name="working_week"
                   variant="outlined"
                   margin="normal"
@@ -207,6 +300,7 @@ const MemberForm = (props) => {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
+                  select
                   required
                   fullWidth
                   label="Política de vacances"
@@ -218,11 +312,19 @@ const MemberForm = (props) => {
                   value={values?.vacation_policy}
                   error={errors.vacation_policy && touched.vacation_policy}
                   helperText={touched.vacation_policy && errors.vacation_policy}
-                  disabled={!editable}
-                />
+                  disabled={!editable || loadingVacationPolicy}
+                >
+                  { vacationPolicy?.results
+                    ? vacationPolicy?.results.map(policy => (
+                      <MenuItem key={policy.id} value={policy.id}>{policy.name}</MenuItem>
+                    ))
+                    : <MenuItem></MenuItem>
+                  }
+                </TextField>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
+                  select
                   required
                   fullWidth
                   label="Gènere"
@@ -232,13 +334,22 @@ const MemberForm = (props) => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   value={values?.gender}
-                  error={errors.gender && touched.gender}
-                  helperText={touched.gender && errors.gender}
-                  disabled={!editable}
-                />
+                  error={!!errorGender || (errors.gender && touched.gender)}
+                  helperText={errorGender || (touched.gender && errors.gender)}
+                  disabled={!editable || loadingGender}
+                >
+                  { gender?.results
+                    ? gender?.results.map(item => (
+                      <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
+                    ))
+                    : <MenuItem></MenuItem>
+                  }
+
+                </TextField>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
+                  select
                   required
                   fullWidth
                   label="Categoria"
@@ -248,28 +359,39 @@ const MemberForm = (props) => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   value={values?.category}
-                  error={errors.category && touched.category}
-                  helperText={touched.category && errors.category}
-                  disabled={!editable}
-                />
+                  error={!!errorCategories || (errors.category && touched.category)}
+                  helperText={errorCategories || (touched.category && errors.category)}
+                  disabled={!editable || loadingCategories}
+                >
+                  { categories?.results
+                    ? categories?.results.map(item => (
+                      <MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>
+                    ))
+                    : <MenuItem></MenuItem>
+                  }
+                </TextField>
               </Grid>
               <Grid item xs={12}>
-                <Button
-                  className={classes.button}
-                  variant="outlined"
-                  startIcon={<VpnKeyIcon />}
-                  disabled={!editable}
-                >
-                  Canviar password
-                </Button>
-                <Button
-                  className={classes.button}
-                  variant="outlined"
-                  startIcon={<DeleteIcon />}
-                  disabled={!editable}
-                >
-                  Eliminar
-                </Button>
+                { memberId &&
+                  <>
+                    <Button
+                      className={classes.button}
+                      variant="outlined"
+                      startIcon={<VpnKeyIcon />}
+                      disabled={!editable}
+                    >
+                      Canviar password
+                    </Button>
+                    <Button
+                      className={classes.button}
+                      variant="outlined"
+                      startIcon={<DeleteIcon />}
+                      disabled={!editable}
+                    >
+                      Eliminar
+                    </Button>
+                  </>
+                }
               </Grid>
             </Grid>
             <Zoom in={editable} disableStrictModeCompat={true}>
@@ -277,7 +399,8 @@ const MemberForm = (props) => {
                 color="primary"
                 aria-label="save"
                 className={classes.fab}
-                onClick={() => setEditable(false)}
+                disabled={!isValid || loadingPostWorker}
+                onClick={() => { console.log(values); postWorker(values); onSuccess() }}
               >
                 <SaveIcon />
               </Fab>
@@ -295,7 +418,7 @@ const MemberForm = (props) => {
           </form>
         )}
       </Formik>
-    </>
+    </MuiPickersUtilsProvider>
   )
 }
 
