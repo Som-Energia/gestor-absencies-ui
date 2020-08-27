@@ -37,12 +37,12 @@
 - [ ] Marcar el dia actual
 - [ ] API requests
 ### ET --> Usuaris: R57
-- [ ] Boto ADD NEW MEMBER
-- [ ] Filtre
+- [x] Boto ADD NEW MEMBER
+- [x] Filtre
 - [x] Parlar estructura amb Vid
-- [ ] Poder seleccionar i veure la informaci d'un usuari
+- [x] Poder seleccionar i veure la informaci d'un usuari
 ### ET --> Equips
 - [ ] Boto ADD NEW TEAM
-- [ ] Filtre
+- [x] Filtre
 - [x] Parlar estructura amb Vid
 - [ ] Poder seleccionar i veure la informació d'un equip i poder veure els seus integrats, afegir-se, etc...
