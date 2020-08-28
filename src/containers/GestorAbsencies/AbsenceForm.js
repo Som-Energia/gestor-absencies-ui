@@ -49,10 +49,19 @@ const AbsenceForm = (props) => {
 
   const [{ types, loadingTypes, errorTypes }, fetchTypes] = useFetchAbsencesType()
   const [{ responsePostAbsence, loadingPostAbsence, errorPostAbsence }, postAbsence] = usePostAbsence()
+  const [formResponse, setFormResponse] = useState(false)
 
   useEffect(() => {
     fetchTypes()
   }, [])
+
+  useEffect(() => {
+    if (formResponse) {
+      const message = errorPostAbsence === false ? 'Absència creada correctament!' : 'No s\'ha pogut crear l\'absència'
+      const response = { state: errorPostAbsence === false, message: message }
+      onSucces(response)
+    }
+  }, [formResponse])
 
   const initialAbsence = {
     start_time: moment().toISOString(),
@@ -94,7 +103,11 @@ const AbsenceForm = (props) => {
           })
         }
         onSubmit={(values, { setSubmitting }) => {
-          console.log('submit: ', values)
+          async function postForm () {
+            await postAbsence(values)
+            setFormResponse(true)
+          }
+          postForm()
         }}
       >
         {({
@@ -213,7 +226,7 @@ const AbsenceForm = (props) => {
                   aria-label="save"
                   className={classes.fab}
                   disabled={!isValid || loadingPostAbsence}
-                  onClick={() => postAbsence(values) && onSucces() }
+                  onClick={handleSubmit}
                 >
                   <SaveIcon />
                 </Fab>

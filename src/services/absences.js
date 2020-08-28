@@ -272,21 +272,20 @@ export const useFetchGender = () => {
 }
 
 export const usePostAbsence = () => {
-  const [response, setResponse] = useState()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
-
   const { user } = useAuthState()
+
+  const [responsePostAbsence, setResponse] = useState()
+  const [loadingPostAbsence, setLoading] = useState(false)
+  const [errorPostAbsence, setError] = useState(false)
 
   const init = () => {
     setResponse(null)
-    setLoading(false)
+    setLoading(true)
     setError(false)
   }
 
   const postAbsence = async (data) => {
     init()
-    setLoading(true)
     try {
       const result = await axios({
         method: 'POST',
@@ -296,37 +295,39 @@ export const usePostAbsence = () => {
           Authorization: `JWT ${user?.token}`
         }
       })
+      console.log('response! ', result)
       setResponse(result?.data)
     } catch (e) {
-      setResponse(null)
       setError(true)
+      setResponse(null)
+      console.log('catch error!', errorPostAbsence)
     }
+    console.log('loading: ', loadingPostAbsence)
     setLoading(false)
   }
 
-  return [{ response, loading, error }, postAbsence]
+  return [{ responsePostAbsence, loadingPostAbsence, errorPostAbsence }, postAbsence]
 }
 
 export const usePostWorker = () => {
-  const [response, setResponse] = useState()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
+  const [responsePostWorker, setResponse] = useState()
+  const [loadingPostWorker, setLoading] = useState(false)
+  const [errorPostWorker, setError] = useState(false)
 
   const { user } = useAuthState()
 
   const init = () => {
     setResponse(null)
-    setLoading(false)
+    setLoading(true)
     setError(false)
   }
 
   const post = async (data) => {
     init()
-    setLoading(true)
     try {
       const result = await axios({
         method: data.id === 0 ? 'POST' : 'PUT',
-        url: `${API_URL}/absencies/workers/${data.id === 0 ? '' : data.id}`,
+        url: `${API_URL}/absencies/workers${data.id === 0 ? '' : `/${data.id}`}`,
         data: data,
         headers: {
           Authorization: `JWT ${user?.token}`
@@ -334,11 +335,11 @@ export const usePostWorker = () => {
       })
       setResponse(result?.data)
     } catch (e) {
-      setResponse(null)
       setError(true)
+      setResponse(null)
     }
     setLoading(false)
   }
 
-  return [{ response, loading, error }, post]
+  return [{ responsePostWorker, loadingPostWorker, errorPostWorker }, post]
 }

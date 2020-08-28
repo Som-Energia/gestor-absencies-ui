@@ -46,6 +46,8 @@ const MemberForm = (props) => {
   const classes = useStyles()
   const { memberId, onSuccess, onError } = props
   const [editable, setEditable] = useState(!memberId)
+  const [formResponse, setFormResponse] = useState(false)
+
   const [{ member, loading, error }, fetchMember] = useFetchMember()
   const [{ vacationPolicy, loadingVacationPolicy, errorVacationPolicy }, loadVacationPolicy] = useFetchVacationPolicy()
   const [{ gender, loadingGender, errorGender }, loadGender] = useFetchGender()
@@ -59,6 +61,16 @@ const MemberForm = (props) => {
     loadGender()
   }, [memberId])
 
+  useEffect(() => {
+    if (formResponse) {
+      const message = errorPostWorker === false
+        ? memberId ? 'Membre modificat correctament!' : 'Membre creat correctament!'
+        : memberId ? 'No s\'ha pogut modificar el membre!' : 'No s\'ha pogut crear el membre!'
+      const response = { state: errorPostWorker === false, message: message }
+      onSuccess(response)
+    }
+  }, [formResponse])
+
   const initialMember = {
     id: 0,
     first_name: '',
@@ -67,7 +79,7 @@ const MemberForm = (props) => {
     password: '',
     username: '',
     holidays: '',
-    contract_date: '',
+    contract_date: moment().toISOString(),
     working_week: '',
     vacation_policy: '',
     gender: '',
@@ -127,7 +139,11 @@ const MemberForm = (props) => {
           )
         }
         onSubmit={(values, { setSubmitting }) => {
-          console.log('submit: ', values)
+          async function postForm () {
+            await postWorker(values)
+            setFormResponse(true)
+          }
+          postForm()
         }}
       >
         {({
@@ -400,7 +416,7 @@ const MemberForm = (props) => {
                 aria-label="save"
                 className={classes.fab}
                 disabled={!isValid || loadingPostWorker}
-                onClick={() => { console.log(values); postWorker(values); onSuccess() }}
+                onClick={handleSubmit}
               >
                 <SaveIcon />
               </Fab>

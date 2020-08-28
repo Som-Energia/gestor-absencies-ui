@@ -197,6 +197,7 @@ const Absences = () => {
   const [open, setOpen] = useState(false)
   const [totalAbsences, setTotalAbsences] = useState('-')
   const [totalHolidays, setTotalHolidays] = useState('-')
+  const [formResponse, setFormResponse] = useState({})
 
   const nextYear = () => {
     const next = year + 1
@@ -208,9 +209,11 @@ const Absences = () => {
     prev >= moment().year() - 5 && setYear(prev)
   }
 
-  const handleAccept = () => {
+  const handleAccept = (response = {}) => {
     setOpen(false)
-    fetch(`/absencies/absences?worker=${user_id}&start_period=${year}-01-01&end_period=${year}-12-31`)
+    setFormResponse(response)
+    response?.state === true &&
+      fetch(`/absencies/absences?worker=${user_id}&start_period=${year}-01-01&end_period=${year}-12-31`)
   }
 
   const handleClose = () => {
@@ -324,9 +327,14 @@ const Absences = () => {
           <AddIcon />
         </Fab>
       </Zoom>
-      <Snackbar open={ !!error || !!errorMember || !!errorTypes }>
+      <Snackbar open={!!error || !!errorMember || !!errorTypes}>
         <Alert severity="error">
           { error || errorMember || errorTypes }
+        </Alert>
+      </Snackbar>
+      <Snackbar open={!!formResponse?.message} autoHideDuration={6000} onClose={() => setFormResponse({})}>
+        <Alert severity={formResponse?.state === true ? 'success' : 'error'}>
+          { formResponse?.message }
         </Alert>
       </Snackbar>
     </>

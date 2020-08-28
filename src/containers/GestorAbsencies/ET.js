@@ -77,7 +77,7 @@ const ET = () => {
       const filtered = members.results.filter(member => member.first_name.match(exp) || member.last_name.match(exp) || member.email.match(exp))
       setFilteredMembers(filtered)
     }
-    if (activeTab === 0 && teams?.results) {
+    if (activeTab === 1 && teams?.results) {
       const filtered = teams.results.filter(team => team.name.match(exp))
       setFilteredTeams(filtered)
     }
@@ -95,6 +95,7 @@ const ET = () => {
   const MembersListTab = () => {
     const [open, setOpen] = useState(false)
     const [memberId, setMemberId] = useState()
+    const [formResponse, setFormResponse] = useState({})
 
     const handleClick = () => {
       setMemberId(false)
@@ -106,8 +107,11 @@ const ET = () => {
       setMemberId(memberId)
     }
 
-    const handleAccept = () => {
+    const handleAccept = (response = {}) => {
       setOpen(false)
+      setFormResponse(response)
+      response?.state === true &&
+        fetchMembers()
     }
 
     const handleClose = () => {
@@ -149,6 +153,11 @@ const ET = () => {
         <Snackbar open={ !!errorMembers }>
           <Alert severity="error">
             { errorMembers }
+          </Alert>
+        </Snackbar>
+        <Snackbar open={!!formResponse?.message} autoHideDuration={6000} onClose={() => setFormResponse({})}>
+          <Alert severity={formResponse?.state === true ? 'success' : 'error'}>
+            { formResponse?.message }
           </Alert>
         </Snackbar>
       </>
