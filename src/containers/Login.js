@@ -8,7 +8,7 @@ import Avatar from '@material-ui/core/Avatar'
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
 import Checkbox from '@material-ui/core/Checkbox'
-import CssBaseLine from '@material-ui/core/CssBaseLine'
+import CssBaseline from '@material-ui/core/CssBaseline'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import FormHelperText from '@material-ui/core/FormHelperText'
 import Link from '@material-ui/core/Link'
@@ -66,7 +66,7 @@ const Login = (props) => {
 
   return (
     <Container component="main" maxWidth="xs" className={classes.root}>
-      <CssBaseLine />
+      <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
