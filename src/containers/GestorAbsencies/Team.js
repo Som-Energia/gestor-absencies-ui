@@ -4,9 +4,7 @@ import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
 
-import PersonIcon from '@material-ui/icons/Person'
-
-import MemberForm from './MemberForm'
+import GroupIcon from '@material-ui/icons/Group'
 
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -33,20 +31,21 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const Member = (props) => {
+const Team = (props) => {
   const classes = useStyles()
-  const { user } = useAuthState()
+  const { team } = props
+  const { id, name } = team
 
   return (
     <>
       <Card className={classes.paper} elevation={0}>
-        <CardHeader className={classes.title} title="El meu perfil" avatar={<PersonIcon />} />
+        <CardHeader className={classes.title} title={name} avatar={<GroupIcon />} />
         <CardContent>
-          <MemberForm memberId={user?.user_id} />
+
         </CardContent>
       </Card>
     </>
   )
 }
 
-export default Member
+export default Team

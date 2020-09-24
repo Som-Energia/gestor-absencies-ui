@@ -12,10 +12,11 @@ const useStyles = makeStyles((theme) => ({
   monthGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(7,1fr)',
-    margin: '16px 16px 24px 16px',
+    margin: '16px 40px 24px 40px',
     padding: 0
   },
   monthItem: {
+    justifySelf: 'center',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

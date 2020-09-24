@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 
 import { Formik } from 'formik'
@@ -18,9 +18,9 @@ import Grid from '@material-ui/core/Grid'
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 
-// import CopyRight from '../Components/CopyRight'
+// import CopyRight from 'Components/CopyRight'
 import { makeStyles, Container, Typography } from '@material-ui/core'
-import { useAuthState } from '../context/auth'
+import { useAuthState } from 'context/auth'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -125,7 +125,7 @@ const Login = (props) => {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 value={values.email}
-                error={errors.email && touched.email}
+                error={(errors.email && touched.email) || error}
                 helperText={touched.email && errors.email}
               />
               <TextField
@@ -141,7 +141,7 @@ const Login = (props) => {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 value={values.password}
-                error={errors.password && touched.password}
+                error={(errors.password && touched.password) || error}
                 helperText={touched.password && errors.password}
               />
               <FormControlLabel

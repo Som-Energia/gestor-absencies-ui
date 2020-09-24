@@ -2,19 +2,16 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { BrowserRouter as Router, Switch, Route, Link as RouterLink, useLocation, useRouteMatch } from 'react-router-dom'
 
-import AppBar from '@material-ui/core/AppBar'
 import Breadcrumbs from '@material-ui/core/Breadcrumbs'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Divider from '@material-ui/core/Divider'
 import Drawer from '@material-ui/core/Drawer'
 import Hidden from '@material-ui/core/Hidden'
-import IconButton from '@material-ui/core/IconButton'
 import Link from '@material-ui/core/Link'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
-import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 
 import ViewCompactIcon from '@material-ui/icons/ViewCompact'
@@ -30,6 +27,8 @@ import Calendar from './GestorAbsencies/Calendar'
 import Member from './GestorAbsencies/Member'
 import ET from './GestorAbsencies/ET'
 import SomEnergia from './GestorAbsencies/SomEnergia'
+
+import Team from './GestorAbsencies/Team'
 
 const drawerWidth = 240
 
@@ -63,15 +62,16 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3)
+    padding: theme.spacing(3),
+    width: `calc(100% - ${drawerWidth}px)`
   }
 }))
 
 const breadcrumbNameMap = {
   '': 'Absències',
-  '/member': 'El meu perfil',
   '/calendar': 'Calendari',
-  '/et': 'ET',
+  '/et': 'Equip Tècnic',
+  '/member': 'El meu perfil',
   '/somenergia': 'Som Energia'
 }
 
@@ -185,6 +185,9 @@ const GestorAbsencies = (props) => {
           </Route>
           <Route exact path={`${path}/et`}>
             <ET />
+          </Route>
+          <Route exact path={`${path}/et/team`}>
+            <Team team={location?.state?.team} />
           </Route>
           <Route exact path={`${path}/somenergia`}>
             <SomEnergia />

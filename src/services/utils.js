@@ -11,3 +11,18 @@ export const countAbsencesType = (data, type = false) => {
   })
   return count
 }
+
+export const absenceTypeName = (types, typeId) => {
+  console.log(types)
+  return Array.isArray(types) && types.filter(({ id }) => id === typeId)[0]?.name
+}
+
+export const absenceTypeEmoji = (typeId) => {
+  // 🏖 🎉 👩🏽‍🎓 🤧 😷 🤒 ⚰️
+  switch (typeId) {
+    case 2:
+      return '🏖'
+    default:
+      return '🎉'
+  }
+}

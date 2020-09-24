@@ -25,7 +25,7 @@ import SaveIcon from '@material-ui/icons/Save'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-import { usePostAbsence, useFetchAbsencesType } from '../../services/absences'
+import { usePostAbsence, useFetchAbsencesType } from 'services/absences'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -150,9 +150,10 @@ const AbsenceForm = (props) => {
                   fullWidth
                   variant="inline"
                   autoOk
+                  disabled={values.absence_type === ''}
                   disablePast="true"
                   inputVariant="outlined"
-                  onChange={event => setFieldValue('start_time', moment(event).toISOString())}
+                  onChange={event => setFieldValue('start_time', moment(event).format('YYYY-MM-DDT09:00:00'))}
                   onBlur={handleBlur}
                   format="DD/MM/YYYY"
                   InputProps={{
@@ -164,7 +165,6 @@ const AbsenceForm = (props) => {
                   value={values.start_time || ''}
                   error={!!errors.start_time}
                   helperText={errors.start_time || firstDateHelper}
-                  disabled={!editable}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -173,9 +173,10 @@ const AbsenceForm = (props) => {
                   fullWidth
                   variant="inline"
                   autoOk
+                  disabled={values.absence_type === ''}
                   disablePast="true"
                   inputVariant="outlined"
-                  onChange={event => setFieldValue('end_time', moment(event).toISOString())}
+                  onChange={event => setFieldValue('end_time', moment(event).format('YYYY-MM-DDT17:00:00'))}
                   onBlur={handleBlur}
                   format="DD/MM/YYYY"
                   InputProps={{
@@ -187,7 +188,6 @@ const AbsenceForm = (props) => {
                   value={values.end_time || ''}
                   error={!!errors.end_time}
                   helperText={errors.end_time || lastDateHelper}
-                  disabled={!editable}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>

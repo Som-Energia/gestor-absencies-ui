@@ -6,12 +6,13 @@ import MenuItem from '@material-ui/core/MenuItem'
 import IconButton from '@material-ui/core/IconButton'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 
+import AddIcon from '@material-ui/icons/Add'
 import EditIcon from '@material-ui/icons/Edit'
 import DeleteIcon from '@material-ui/icons/Delete'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 const EditMenu = (props) => {
-  const { onEdit } = props
+  const { onEdit, onAdd = false } = props
   const [anchorEl, setAnchorEl] = useState(null)
 
   const handleClick = (event) => {
@@ -33,6 +34,12 @@ const EditMenu = (props) => {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
+        {
+          onAdd !== false &&
+          <MenuItem onClick={ () => handleClose() & onAdd() }>
+            <ListItemIcon><AddIcon /></ListItemIcon>Afegir
+          </MenuItem>
+        }
         <MenuItem onClick={ () => handleClose() & onEdit() }>
           <ListItemIcon><EditIcon /></ListItemIcon>Editar
         </MenuItem>

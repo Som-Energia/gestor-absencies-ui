@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import moment from 'moment'
 
-import { loginService } from '../services/authentication'
+import { loginService } from 'services/authentication'
 
 const AuthContext = React.createContext()
 

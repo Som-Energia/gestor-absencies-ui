@@ -1,12 +1,14 @@
 import React from 'react'
 
+import { useHistory } from 'react-router-dom'
+
 import Avatar from '@material-ui/core/Avatar'
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import Grid from '@material-ui/core/Grid'
 import Zoom from '@material-ui/core/Zoom'
 
-import EditMenu from './EditMenu'
+import EditMenu from '../EditMenu'
 
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -27,28 +29,35 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const MembersList = ({ members = [], active = true, onEdit = () => {} }) => {
+const TeamsList = ({ teams = [], active = true, onEdit = () => {} }) => {
   const classes = useStyles()
-  console.log(members)
+  const history = useHistory()
+
+  const handleClick = (team) => {
+    history.push('/gestor-absencies/et/team', { team: team })
+  }
 
   return (
     <>
       {
-        members.map(member => (
-          <Grid key={member.id} className={classes.listItem} item xs={12} sm={4}>
-            <Zoom in={active}>
+        teams.map(team => (
+          <Grid key={team.id} className={classes.listItem} item xs={12} sm={4}>
+            <Zoom in={true}>
               <Card className={classes.card} elevation={0}>
                 <CardHeader
                   avatar={
                     <Avatar aria-label="member" className={classes.avatar}>
-                      { member.first_name.charAt(0).toUpperCase() }
+                      { team.name.charAt(0).toUpperCase() }
                     </Avatar>
                   }
                   action={
-                    <EditMenu onEdit={ () => onEdit(member.id) } />
+                    <EditMenu
+                      onEdit={ () => onEdit(team.id) }
+                      onAdd={ () => handleClick(team)}
+                    />
                   }
-                  title={ `${member.first_name} ${member.last_name}` }
-                  subheader={member.email}
+                  title={ `${team.name}` }
+                  subheader={''}
                 />
               </Card>
             </Zoom>
@@ -59,4 +68,4 @@ const MembersList = ({ members = [], active = true, onEdit = () => {} }) => {
   )
 }
 
-export default MembersList
+export default TeamsList

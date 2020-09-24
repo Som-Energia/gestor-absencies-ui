@@ -28,21 +28,21 @@
 - [ ] Boto ELIMINAR
 - [ ] Boto CANVI PASSWORD
 ### Calendari
-- [ ] Visualitzar mes
-- [ ] Canviar mes
+- [x] Visualitzar mes
+- [x] Canviar mes
 - [ ] Filtre Usuari
 - [ ] Filtre Equip
-- [ ] Pintar els FINDES
-- [ ] Pintar les absències
+- [x] Pintar els FINDES
+- [x] Pintar les absències
 - [ ] Marcar el dia actual
-- [ ] API requests
+- [x] API requests
 ### ET --> Usuaris: R57
 - [x] Boto ADD NEW MEMBER
 - [x] Filtre
 - [x] Parlar estructura amb Vid
 - [x] Poder seleccionar i veure la informaci d'un usuari
 ### ET --> Equips
-- [ ] Boto ADD NEW TEAM
+- [x] Boto ADD NEW TEAM
 - [x] Filtre
 - [x] Parlar estructura amb Vid
 - [ ] Poder seleccionar i veure la informació d'un equip i poder veure els seus integrats, afegir-se, etc...

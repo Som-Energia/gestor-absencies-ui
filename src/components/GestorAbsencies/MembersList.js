@@ -6,7 +6,7 @@ import CardHeader from '@material-ui/core/CardHeader'
 import Grid from '@material-ui/core/Grid'
 import Zoom from '@material-ui/core/Zoom'
 
-import EditMenu from './EditMenu'
+import EditMenu from 'components/EditMenu'
 
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -27,28 +27,28 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const TeamsList = ({ teams = [], active = true, onEdit = () => {} }) => {
+const MembersList = ({ members = [], active = true, onEdit = () => {} }) => {
   const classes = useStyles()
-  console.log(teams)
+  console.log(members)
 
   return (
     <>
       {
-        teams.map(team => (
-          <Grid key={team.id} className={classes.listItem} item xs={12} sm={4}>
-            <Zoom in={true}>
+        members.map(member => (
+          <Grid key={member.id} className={classes.listItem} item xs={12} sm={4}>
+            <Zoom in={active}>
               <Card className={classes.card} elevation={0}>
                 <CardHeader
                   avatar={
                     <Avatar aria-label="member" className={classes.avatar}>
-                      { team.name.charAt(0).toUpperCase() }
+                      { member.first_name.charAt(0).toUpperCase() }
                     </Avatar>
                   }
                   action={
-                    <EditMenu onEdit={ () => onEdit(team.id) } />
+                    <EditMenu onEdit={ () => onEdit(member.id) } />
                   }
-                  title={ `${team.name}` }
-                  subheader={''}
+                  title={ `${member.first_name} ${member.last_name}` }
+                  subheader={member.email}
                 />
               </Card>
             </Zoom>
@@ -59,4 +59,4 @@ const TeamsList = ({ teams = [], active = true, onEdit = () => {} }) => {
   )
 }
 
-export default TeamsList
+export default MembersList

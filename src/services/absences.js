@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import axios from 'axios'
-import { useAuthState } from '../context/auth'
+import { useAuthState } from 'context/auth'
 
 export const API_URL = 'https://gestorabsencies-demo.somenergia.local'
 export const APP = axios.create({ baseURL: API_URL })
@@ -135,6 +135,38 @@ export const useFetchTeams = () => {
   }
 
   return [{ teams, loadingTeams, errorTeams, setTeams }, load]
+}
+
+export const useFetchTeam = () => {
+  const [team, setTeam] = useState({})
+  const [loadingTeam, setLoading] = useState(false)
+  const [errorTeam, setError] = useState(false)
+
+  const { user } = useAuthState()
+
+  const init = () => {
+    setTeam(null)
+    setLoading(false)
+    setError(false)
+  }
+
+  const load = async (memberId) => {
+    init()
+    setLoading(true)
+    try {
+      const result = await axios.get(`${API_URL}/absencies/teams/${memberId}`, {
+        headers: {
+          Authorization: `JWT ${user?.token}`
+        }
+      })
+      setTeam(result?.data)
+    } catch (e) {
+      setError(true)
+    }
+    setLoading(false)
+  }
+
+  return [{ team, loadingTeam, errorTeam }, load]
 }
 
 export const useFetchAbsencesType = () => {
@@ -342,4 +374,73 @@ export const usePostWorker = () => {
   }
 
   return [{ responsePostWorker, loadingPostWorker, errorPostWorker }, post]
+}
+
+export const usePostTeam = () => {
+  const [responsePostTeam, setResponse] = useState()
+  const [loadingPostTeam, setLoading] = useState(false)
+  const [errorPostTeam, setError] = useState(false)
+
+  const { user } = useAuthState()
+
+  const init = () => {
+    setResponse(null)
+    setLoading(true)
+    setError(false)
+  }
+
+  const post = async (data) => {
+    init()
+    try {
+      const result = await axios({
+        method: data.id === 0 ? 'POST' : 'PUT',
+        url: `${API_URL}/absencies/teams${data.id === 0 ? '' : `/${data.id}`}`,
+        data: data,
+        headers: {
+          Authorization: `JWT ${user?.token}`
+        }
+      })
+      setResponse(result?.data)
+    } catch (e) {
+      setError(true)
+      setResponse(null)
+    }
+    setLoading(false)
+  }
+
+  return [{ responsePostTeam, loadingPostTeam, errorPostTeam }, post]
+}
+
+export const useRemoveTeam = () => {
+  const [responseRemoveTeam, setResponse] = useState()
+  const [loadingRemoveTeam, setLoading] = useState(false)
+  const [errorRemoveTeam, setError] = useState(false)
+
+  const { user } = useAuthState()
+
+  const init = () => {
+    setResponse(null)
+    setLoading(true)
+    setError(false)
+  }
+
+  const remove = async (data) => {
+    init()
+    try {
+      const result = await axios({
+        method: 'DELETE',
+        url: `${API_URL}/absencies/teams/${data.id}`,
+        headers: {
+          Authorization: `JWT ${user?.token}`
+        }
+      })
+      setResponse(result?.data)
+    } catch (e) {
+      setError(true)
+      setResponse(null)
+    }
+    setLoading(false)
+  }
+
+  return [{ responseRemoveTeam, loadingRemoveTeam, errorRemoveTeam }, remove]
 }

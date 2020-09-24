@@ -15,9 +15,9 @@ import Menu from '@material-ui/core/Menu'
 import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 import PersonIcon from '@material-ui/icons/Person'
 
-import { useAuthState } from '../context/auth'
+import { useAuthState } from 'context/auth'
 
-import cuca from '../images/cuca.svg'
+import cuca from 'images/cuca.svg'
 
 const useStyles = makeStyles((theme) => ({
   root: {

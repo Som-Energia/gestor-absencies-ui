@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
   },
   container: {
     position: 'relative',
-    height: 'calc(100vh - 64px)'
+    minHeight: 'calc(100vh - 64px)'
   }
 }))
 
