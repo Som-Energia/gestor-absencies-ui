@@ -444,3 +444,37 @@ export const useRemoveTeam = () => {
 
   return [{ responseRemoveTeam, loadingRemoveTeam, errorRemoveTeam }, remove]
 }
+
+export const useRemoveWorker = () => {
+  const [responseRemoveWorker, setResponse] = useState()
+  const [loadingRemoveWorker, setLoading] = useState(false)
+  const [errorRemoveWorker, setError] = useState(false)
+
+  const { user } = useAuthState()
+
+  const init = () => {
+    setResponse(null)
+    setLoading(true)
+    setError(false)
+  }
+
+  const remove = async (data) => {
+    init()
+    try {
+      const result = await axios({
+        method: 'DELETE',
+        url: `${API_URL}/absencies/workers/${data.id}`,
+        headers: {
+          Authorization: `JWT ${user?.token}`
+        }
+      })
+      setResponse(result?.data)
+    } catch (e) {
+      setError(true)
+      setResponse(null)
+    }
+    setLoading(false)
+  }
+
+  return [{ responseRemoveWorker, loadingRemoveWorker, errorRemoveWorker }, remove]
+}

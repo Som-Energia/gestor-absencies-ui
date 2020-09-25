@@ -22,7 +22,7 @@ import VpnKeyIcon from '@material-ui/icons/VpnKey'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-import { useFetchMember, useFetchVacationPolicy, useFetchCategories, useFetchGender, usePostWorker } from 'services/absences'
+import { useFetchMember, useFetchVacationPolicy, useFetchCategories, useFetchGender, usePostWorker, useRemoveWorker } from 'services/absences'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -50,6 +50,7 @@ const MemberForm = (props) => {
   const [{ gender, loadingGender, errorGender }, loadGender] = useFetchGender()
   const [{ categories, loadingCategories, errorCategories }, loadCategories] = useFetchCategories()
   const [{ response, loadingPostWorker, errorPostWorker }, postWorker] = usePostWorker()
+  const [{ responseRemove, loadingRemoveWorker, errorRemoveWorker }, removeWorker] = useRemoveWorker()
 
   useEffect(() => {
     memberId && fetchMember(memberId)
@@ -60,9 +61,12 @@ const MemberForm = (props) => {
 
   useEffect(() => {
     if (formResponse) {
-      const message = errorPostWorker === false
+      const message = errorRemoveWorker === false
+      ? errorPostWorker === false
         ? memberId ? 'Membre modificat correctament!' : 'Membre creat correctament!'
         : memberId ? 'No s\'ha pogut modificar el membre!' : 'No s\'ha pogut crear el membre!'
+      : 'No s\'ha pogut eliminar el membre!'
+
       const response = { state: errorPostWorker === false, message: message }
       onSuccess(response)
     }
@@ -400,6 +404,13 @@ const MemberForm = (props) => {
                       variant="outlined"
                       startIcon={<DeleteIcon />}
                       disabled={!editable}
+                      onClick={() => {
+                        async function deleteForm () {
+                          await removeWorker(values)
+                          setFormResponse(responseRemove)
+                        }
+                        deleteForm()
+                      }}
                     >
                       Eliminar
                     </Button>
@@ -412,7 +423,7 @@ const MemberForm = (props) => {
                 color="primary"
                 aria-label="save"
                 className={classes.fab}
-                disabled={!isValid || loadingPostWorker}
+                disabled={!isValid || loadingPostWorker || loadingRemoveWorker}
                 onClick={handleSubmit}
               >
                 <SaveIcon />
