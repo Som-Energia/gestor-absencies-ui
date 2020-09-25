@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
@@ -12,8 +12,9 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 const EditMenu = (props) => {
-  const { onEdit, onAdd = false } = props
+  const { onEdit = false, onAdd = false, onDelete = false, customize = {} } = props
   const [anchorEl, setAnchorEl] = useState(null)
+  const [activeItems, setActiveItems] = useState([])
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -23,11 +24,39 @@ const EditMenu = (props) => {
     setAnchorEl(null)
   }
 
+  useEffect(() => {
+    const filteredItems = [onAdd, onEdit, onDelete].filter(item => item !== false)
+    setActiveItems(filteredItems)
+  }, [onAdd, onEdit, onDelete])
+
   return (
     <>
-      <IconButton aria-label="settings" onClick={handleClick}>
-        <MoreVertIcon />
-      </IconButton>
+      {
+        activeItems.length !== 1
+          ? <IconButton aria-label="settings" onClick={handleClick}>
+            <MoreVertIcon />
+          </IconButton>
+          : <>
+            {
+              onAdd !== false &&
+              <IconButton onClick={ () => handleClose() & onAdd() }>
+                <AddIcon />
+              </IconButton>
+            }
+            {
+              onEdit !== false &&
+              <IconButton onClick={ () => handleClose() & onEdit() }>
+                <EditIcon />
+              </IconButton>
+            }
+            {
+              onDelete !== false &&
+              <IconButton onClick={ () => handleClose() & onDelete() }>
+                <DeleteIcon/>
+              </IconButton>
+            }
+          </>
+      }
       <Menu
         anchorEl={anchorEl}
         keepMounted
@@ -37,15 +66,21 @@ const EditMenu = (props) => {
         {
           onAdd !== false &&
           <MenuItem onClick={ () => handleClose() & onAdd() }>
-            <ListItemIcon><AddIcon /></ListItemIcon>Afegir
+            <ListItemIcon><AddIcon /></ListItemIcon> { customize?.add ? customize?.add : 'Afegir' }
           </MenuItem>
         }
-        <MenuItem onClick={ () => handleClose() & onEdit() }>
-          <ListItemIcon><EditIcon /></ListItemIcon>Editar
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon><DeleteIcon /></ListItemIcon>Eliminar
-        </MenuItem>
+        {
+          onEdit !== false &&
+          <MenuItem onClick={ () => handleClose() & onEdit() }>
+            <ListItemIcon><EditIcon /></ListItemIcon> { customize?.edit ? customize?.edit : 'Editar' }
+          </MenuItem>
+        }
+        {
+          onDelete !== false &&
+          <MenuItem onClick={ () => handleClose() & onDelete() }>
+            <ListItemIcon><DeleteIcon /></ListItemIcon> { customize?.delete ? customize?.delete : 'Eliminar' }
+          </MenuItem>
+        }
       </Menu>
     </>
   )
