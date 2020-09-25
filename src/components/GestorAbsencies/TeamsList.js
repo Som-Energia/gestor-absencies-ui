@@ -1,7 +1,5 @@
 import React from 'react'
 
-import { useHistory } from 'react-router-dom'
-
 import Avatar from '@material-ui/core/Avatar'
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
@@ -29,13 +27,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const TeamsList = ({ teams = [], active = true, onEdit = () => {} }) => {
+const TeamsList = (props) => {
+  const { teams = [], active = true, onAdd = () => {}, onEdit = () => {}, onDelete = () => {}, customize } = props
   const classes = useStyles()
-  const history = useHistory()
-
-  const handleClick = (team) => {
-    history.push('/gestor-absencies/et/team', { team: team })
-  }
 
   return (
     <>
@@ -52,8 +46,10 @@ const TeamsList = ({ teams = [], active = true, onEdit = () => {} }) => {
                   }
                   action={
                     <EditMenu
-                      onEdit={ () => onEdit(team.id) }
-                      onAdd={ () => handleClick(team)}
+                      onAdd={ () => onAdd(team) }
+                      onEdit={ () => onEdit(team) }
+                      onDelete={ () => onDelete(team) }
+                      customize={customize}
                     />
                   }
                   title={ `${team.name}` }

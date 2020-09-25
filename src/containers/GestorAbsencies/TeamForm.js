@@ -49,10 +49,10 @@ const TeamForm = (props) => {
   useEffect(() => {
     if (formResponse) {
       const message = errorRemoveTeam === false
-      ? errorPostTeam === false
-        ? teamId ? 'Equip modificat correctament!' : 'Equip creat correctament!'
-        : teamId ? 'No s\'ha pogut modificar l\'equip!' : 'No s\'ha pogut crear l\'equip!'
-      : 'No s\'ha pogut eliminar l\'equip!'
+        ? errorPostTeam === false
+          ? teamId ? 'Equip modificat correctament!' : 'Equip creat correctament!'
+          : teamId ? 'No s\'ha pogut modificar l\'equip!' : 'No s\'ha pogut crear l\'equip!'
+        : 'No s\'ha pogut eliminar l\'equip!'
 
       const response = { state: errorPostTeam === false, message: message }
       onSuccess(response)

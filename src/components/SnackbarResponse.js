@@ -8,7 +8,9 @@ const SnackbarResponse = (props) => {
   return (
     <Snackbar open={!!message} autoHideDuration={6000} onClose={onClose}>
       <Alert severity={state === true ? 'success' : 'error'}>
-        {message}
+        {
+          message === true ? 'Ha fallat alguna cosa...' : message
+        }
       </Alert>
     </Snackbar>
   )

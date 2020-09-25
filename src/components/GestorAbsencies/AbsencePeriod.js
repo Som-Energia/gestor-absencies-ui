@@ -54,11 +54,11 @@ const useStyles = makeStyles((theme) => ({
     '& h5': {
       flex: '1 1 auto',
       minWidth: 0,
-      fontWeight: '300',
+      fontWeight: '400',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
-      fontSize: '1.1rem',
+      fontSize: '1rem',
       lineHeight: '25px',
       margin: 0,
       textTransform: 'uppercase',

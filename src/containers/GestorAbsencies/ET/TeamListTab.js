@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
+import { useHistory } from 'react-router-dom'
+
 import { makeStyles } from '@material-ui/core/styles'
 
 import Alert from '@material-ui/lab/Alert'
@@ -16,7 +18,7 @@ import TeamForm from 'containers/GestorAbsencies/TeamForm'
 
 import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined'
 
-import { useFetchTeams } from 'services/absences'
+import { useFetchTeams, useRemoveTeam } from 'services/absences'
 
 const useStyles = makeStyles((theme) => ({
   fab: {
@@ -28,18 +30,20 @@ const useStyles = makeStyles((theme) => ({
 
 const TeamsListTab = (props) => {
   const { filter } = props
+  const history = useHistory()
+  const classes = useStyles()
 
   const [filteredTeams, setFilteredTeams] = useState(false)
   const [{ teams, loadingTeams, errorTeams }, fetchTeams] = useFetchTeams()
+  const [{ responseRemoveTeam, loadingRemoveTeam, errorRemoveTeam }, removeTeam] = useRemoveTeam()
 
-  const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [teamId, setTeamId] = useState()
   const [formResponse, setFormResponse] = useState({})
 
   useEffect(() => {
     fetchTeams()
-  }, [])
+  }, [responseRemoveTeam])
 
   useEffect(() => {
     const exp = new RegExp(filter, 'i')
@@ -60,21 +64,36 @@ const TeamsListTab = (props) => {
     setOpen(false)
   }
 
-  const handleEdit = (teamId) => {
-    setOpen(true)
-    setTeamId(teamId)
-  }
-
   const handleClick = () => {
     setTeamId(false)
     setOpen(true)
+  }
+
+  const handleEdit = (team) => {
+    const { id } = team
+    setOpen(true)
+    setTeamId(id)
+  }
+
+  const handleAdd = (team) => {
+    history.push('/gestor-absencies/et/team', { team: team })
+  }
+
+  const handleDelete = (team) => {
+    removeTeam(team)
   }
 
   return (
     <>
       {
         teams?.results
-          ? <TeamsList teams={filteredTeams || teams.results} onEdit={handleEdit} />
+          ? <TeamsList
+            teams={filteredTeams || teams.results}
+            onEdit={handleEdit}
+            onAdd={handleAdd}
+            onDelete={handleDelete}
+            customize={{ add: 'Afegir membres' }}
+          />
           : loadingTeams
             ? <SkeletonList numItems={15} />
             : <></>
@@ -99,7 +118,7 @@ const TeamsListTab = (props) => {
           <PersonAddOutlinedIcon />
         </Fab>
       </Zoom>
-      <SnackbarResponse state={false} message={errorTeams} onClose={() => {}} />
+      <SnackbarResponse state={false} message={errorTeams || errorRemoveTeam} onClose={() => {}} />
       <SnackbarResponse state={formResponse?.state} message={formResponse?.message} onClose={() => setFormResponse({})} />
     </>
   )

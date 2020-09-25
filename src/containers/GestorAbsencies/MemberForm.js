@@ -62,10 +62,10 @@ const MemberForm = (props) => {
   useEffect(() => {
     if (formResponse) {
       const message = errorRemoveWorker === false
-      ? errorPostWorker === false
-        ? memberId ? 'Membre modificat correctament!' : 'Membre creat correctament!'
-        : memberId ? 'No s\'ha pogut modificar el membre!' : 'No s\'ha pogut crear el membre!'
-      : 'No s\'ha pogut eliminar el membre!'
+        ? errorPostWorker === false
+          ? memberId ? 'Membre modificat correctament!' : 'Membre creat correctament!'
+          : memberId ? 'No s\'ha pogut modificar el membre!' : 'No s\'ha pogut crear el membre!'
+        : 'No s\'ha pogut eliminar el membre!'
 
       const response = { state: errorPostWorker === false, message: message }
       onSuccess(response)

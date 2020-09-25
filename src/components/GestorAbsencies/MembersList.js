@@ -27,15 +27,15 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const MembersList = ({ members = [], active = true, onEdit = () => {} }) => {
+const MembersList = (props) => {
+  const { members = [], active = true, onAdd = false, onEdit = false, onDelete = false, customize, gridItemSize = 4 } = props
   const classes = useStyles()
-  console.log(members)
 
   return (
     <>
       {
         members.map(member => (
-          <Grid key={member.id} className={classes.listItem} item xs={12} sm={4}>
+          <Grid key={member.id} className={classes.listItem} item xs={12} sm={gridItemSize}>
             <Zoom in={active}>
               <Card className={classes.card} elevation={0}>
                 <CardHeader
@@ -45,7 +45,12 @@ const MembersList = ({ members = [], active = true, onEdit = () => {} }) => {
                     </Avatar>
                   }
                   action={
-                    <EditMenu onEdit={ () => onEdit(member.id) } />
+                    <EditMenu
+                      onAdd={ onAdd === false ? false : () => onAdd(member) }
+                      onEdit={ onEdit === false ? false : () => onEdit(member) }
+                      onDelete={ onDelete === false ? false : () => onDelete(member) }
+                      customize={customize}
+                    />
                   }
                   title={ `${member.first_name} ${member.last_name}` }
                   subheader={member.email}

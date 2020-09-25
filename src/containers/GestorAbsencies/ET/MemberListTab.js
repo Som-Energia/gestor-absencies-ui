@@ -16,7 +16,7 @@ import MemberForm from 'containers/GestorAbsencies/MemberForm'
 
 import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined'
 
-import { useFetchMembers } from 'services/absences'
+import { useFetchMembers, useRemoveWorker } from 'services/absences'
 
 const useStyles = makeStyles((theme) => ({
   fab: {
@@ -36,10 +36,11 @@ const MembersListTab = (props) => {
 
   const [filteredMembers, setFilteredMembers] = useState(false)
   const [{ members, loadingMembers, errorMembers }, fetchMembers] = useFetchMembers()
+  const [{ responseRemoveWorker, loadingRemoveWorker, errorRemoveWorker }, removeWorker] = useRemoveWorker()
 
   useEffect(() => {
     fetchMembers()
-  }, [])
+  }, [responseRemoveWorker])
 
   useEffect(() => {
     if (members?.results) {
@@ -54,11 +55,6 @@ const MembersListTab = (props) => {
     setOpen(true)
   }
 
-  const handleEdit = (memberId) => {
-    setOpen(true)
-    setMemberId(memberId)
-  }
-
   const handleAccept = (response = {}) => {
     setOpen(false)
     setFormResponse(response)
@@ -70,6 +66,16 @@ const MembersListTab = (props) => {
     setOpen(false)
   }
 
+  const handleEdit = (member) => {
+    const { id } = member
+    setOpen(true)
+    setMemberId(id)
+  }
+
+  const handleDelete = (member) => {
+    removeWorker(member)
+  }
+
   return (
     <>
       {
@@ -77,6 +83,7 @@ const MembersListTab = (props) => {
           ? <MembersList
             members={filteredMembers || members.results}
             onEdit={handleEdit}
+            onDelete={handleDelete}
           />
           : loadingMembers
             ? <SkeletonList numItems={15} />
@@ -102,12 +109,7 @@ const MembersListTab = (props) => {
           <PersonAddOutlinedIcon />
         </Fab>
       </Zoom>
-      <Snackbar open={ !!errorMembers }>
-        <Alert severity="error">
-          { errorMembers }
-        </Alert>
-      </Snackbar>
-      <SnackbarResponse state={false} message={errorMembers} onClose={() => {}} />
+      <SnackbarResponse state={false} message={errorMembers || errorRemoveWorker} onClose={() => {}} />
       <SnackbarResponse state={formResponse?.state} message={formResponse?.message} onClose={() => setFormResponse({})} />
     </>
   )

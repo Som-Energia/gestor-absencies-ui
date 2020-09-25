@@ -84,11 +84,15 @@ export const useFetchMembers = () => {
     setError(false)
   }
 
-  const load = async () => {
+  const load = async (teamId = false) => {
     init()
     setLoading(true)
     try {
-      const result = await axios.get(`${API_URL}/absencies/workers`, {
+      const URL = !teamId
+        ? `${API_URL}/absencies/workers`
+        : `${API_URL}/absencies/members?team=${teamId}`
+
+      const result = await axios.get(URL, {
         timeout: 10000,
         headers: {
           Authorization: `JWT ${user?.token}`
@@ -102,6 +106,41 @@ export const useFetchMembers = () => {
   }
 
   return [{ members, loadingMembers, errorMembers, setMembers }, load]
+}
+
+export const usePostMember = () => {
+  const [responsePostMember, setResponse] = useState()
+  const [loadingPostMember, setLoading] = useState(false)
+  const [errorPostMember, setError] = useState(false)
+
+  const { user } = useAuthState()
+
+  const init = () => {
+    setResponse(null)
+    setLoading(true)
+    setError(false)
+  }
+
+  const post = async (data = { worker: null, team: null }) => {
+    init()
+    try {
+      const result = await axios({
+        method: 'POST',
+        url: `${API_URL}/absencies/members`,
+        data: data,
+        headers: {
+          Authorization: `JWT ${user?.token}`
+        }
+      })
+      setResponse(result?.data)
+    } catch (e) {
+      setError(true)
+      setResponse(null)
+    }
+    setLoading(false)
+  }
+
+  return [{ responsePostMember, loadingPostMember, errorPostMember }, post]
 }
 
 export const useFetchTeams = () => {
@@ -427,14 +466,14 @@ export const useRemoveTeam = () => {
   const remove = async (data) => {
     init()
     try {
-      const result = await axios({
+      await axios({
         method: 'DELETE',
         url: `${API_URL}/absencies/teams/${data.id}`,
         headers: {
           Authorization: `JWT ${user?.token}`
         }
       })
-      setResponse(result?.data)
+      setResponse(true)
     } catch (e) {
       setError(true)
       setResponse(null)
@@ -461,14 +500,14 @@ export const useRemoveWorker = () => {
   const remove = async (data) => {
     init()
     try {
-      const result = await axios({
+      await axios({
         method: 'DELETE',
         url: `${API_URL}/absencies/workers/${data.id}`,
         headers: {
           Authorization: `JWT ${user?.token}`
         }
       })
-      setResponse(result?.data)
+      setResponse(true)
     } catch (e) {
       setError(true)
       setResponse(null)
