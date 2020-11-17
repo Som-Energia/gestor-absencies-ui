@@ -47,6 +47,14 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     fontSize: '2rem',
     justifyContent: 'center'
+  },
+  littleIconWrapper: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: '1.5rem',
+    justifyContent: 'center'
   }
 }))
 
@@ -71,20 +79,28 @@ const Calendar = () => {
     fetch(`/absencies/absences?start_period=${refDate.year()}-${refDate.month() + 1}-01&end_period=${refDate.year()}-${refDate.month() + 1}-${refDate.daysInMonth()}`)
   }, [refDate])
 
-  useEffect(() => {
+  useEffect(() => { // Rename absences to occurrence??
     const elements = data?.results ? data?.results : []
     elements.forEach(absence => {
       if (absencesGrid[absence?.worker] === undefined) {
         absencesGrid[absence?.worker] = {}
       }
-      const diff = Math.round(Math.abs(moment(absence.end_time).diff(absence.start_time, 'hours')) / 8)
+      const diff = Math.round(
+          Math.abs(
+            moment(absence.end_time).diff(absence.start_time, 'days')
+          )
+      ) + 1
       if (diff > 0) {
-        console.log(diff)
         const arr = [... Array(diff)]
         arr.map((value, index) => {
           const data = moment(absence.start_time).add(index, 'days').format('DDMMYYYY')
-          absencesGrid[absence?.worker][data] = absence.absence_type
+          absencesGrid[absence?.worker][data] = {
+            'absence_type': absence.absence_type,
+            'duration': 1
+          }
         })
+        absencesGrid[absence?.worker][moment(absence.start_time).format('DDMMYYYY')]['duration'] = moment(absence.start_time).hour() != 9 ? 0.5 : 1
+        absencesGrid[absence?.worker][moment(absence.end_time).format('DDMMYYYY')]['duration'] = moment(absence.end_time).hour() != 17 ? 0.5 : 1
       }
     })
     console.log(absencesGrid)
@@ -149,13 +165,17 @@ const Calendar = () => {
                                 && <Tooltip
                                     title={
                                       `${date.format('dddd, DD/MM/YYYY')}
-                                      ${absenceTypeName(types?.results, absencesGrid[worker.id][dateKey])}
+                                      ${absenceTypeName(types?.results, absencesGrid[worker.id][dateKey]['absence_type'])}
                                       `
                                     }
                                   >
-                                    <div className={classes.iconWrapper}>
+                                    <div className={
+                                        absencesGrid[worker.id][dateKey]['duration'] == 1
+                                        ? classes.iconWrapper
+                                        : classes.littleIconWrapper
+                                      }>
                                       {
-                                              absenceTypeEmoji(absencesGrid[worker.id][dateKey])
+                                              absenceTypeEmoji(absencesGrid[worker.id][dateKey]['absence_type'])
                                       }
                                     </div>
                                   </Tooltip>
