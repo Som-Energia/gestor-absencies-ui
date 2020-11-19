@@ -59,6 +59,16 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     fontSize: '1.5rem',
     justifyContent: 'center'
+  },
+  paperTabs: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(1)
+  },
+  filter_worker: {
+    textAlign: 'left'
+  },
+  filter_team: {
+    textAlign: 'right'
   }
 }))
 
@@ -67,14 +77,24 @@ const Calendar = () => {
   const [refDate, setRefDate] = useState(moment().date(1))
   const [days, setDays] = useState([])
   const [absencesGrid, setAbsencesGrid] = useState({})
+  const [filterWorker, setFilterWorker] = useState('')
+  const [filterTeam, setFilterTeam] = useState('')
+  const [filteredMembers, setFilteredMembers] = useState([])
 
   const [{ data, loading, error }, fetch] = useFetch()
   const [{ types, loadingTypes, errorTypes }, fetchTypes] = useFetchAbsencesType()
+  const [{ workers, loadingWorkers, errorWorkers }, fetchWorkers] = useFetchWorkers()
   const [{ members, loadingMembers, errorMembers }, fetchMembers] = useFetchMembers()
+  const [{ teams, loadingTeams, errorTeams }, fetchTeams] = useFetchTeams()
 
   useEffect(() => {
+    fetchWorkers()
     fetchMembers()
+    fetchTeams()
     fetchTypes()
+    setFilterWorker('')
+    setFilterTeam('')
+    setFilteredMembers([])
   }, [])
 
   useEffect(() => {
@@ -122,6 +142,35 @@ const Calendar = () => {
       setRefDate(moment(refDate).subtract(1, 'M'))
   }
 
+  const handleFilterWorker = (event) => {
+    const filter_worker_lowercase = event.target.value.toLowerCase()
+    setFilterWorker(filter_worker_lowercase)
+  }
+
+  const handleFilterTeam = (event) => {
+    const filter_team_lowercase = event.target.value.toLowerCase()
+    setFilterTeam(filter_team_lowercase)
+
+    let teamId = 0;
+    teams.results.forEach((team) => {
+        if (team.name.toLowerCase() == filter_team_lowercase) {
+            teamId = team.id
+        }
+    })
+
+    let filtered_workers_ids = []
+    if (teamId == 0) {
+      fetchMembers()
+    }
+    else {
+      fetchMembers(teamId)
+      members.results.forEach(
+        member => filtered_workers_ids.push(member.worker)
+      )
+    }
+    setFilteredMembers(filtered_workers_ids)
+  }
+
   return (
     <>
       <Grid container>
@@ -132,6 +181,33 @@ const Calendar = () => {
             handleNext={nextMonth}
           />
         </Grid>
+
+        <Paper className={classes.paperTabs} elevation={0}>
+          <Grid container>
+            <Grid item xs={4} className={classes.filter_worker}>
+              <TextField
+                label="Filtre Worker"
+                margin="none"
+                onChange={handleFilterWorker}
+                value={filterWorker}
+                InputProps={{
+                  startAdornment: <IconButton><SearchIcon /></IconButton>
+                }}
+              />
+            </Grid>
+            <Grid item xs={4} className={classes.filter_team}>
+              <TextField
+                label="Filtre Team"
+                margin="none"
+                onChange={handleFilterTeam}
+                value={filterTeam}
+                InputProps={{
+                  startAdornment: <IconButton><SearchIcon /></IconButton>
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Paper>
 
         <Grid item xs={12}>
           <TableContainer className={classes.root} component={Paper}>
@@ -148,8 +224,10 @@ const Calendar = () => {
               </TableHead>
               <TableBody>
                 {
-                  members?.results && members?.results.map(worker =>
-                    <TableRow key={worker.id}>
+                  workers?.results && workers?.results.map(worker =>
+                    `${worker.first_name.toLowerCase()} ${worker.last_name.toLowerCase()}`.includes(filterWorker)
+                    && (filteredMembers.length === 0 || filteredMembers.includes(worker.id))
+                    && <TableRow key={worker.id}>
                       <TableCell className={classes.header} component="th" scope="row" nowrap="nowrap">
                         {`${worker.first_name} ${worker.last_name}`}
                       </TableCell>
