@@ -10,25 +10,25 @@ import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined'
 import GroupIcon from '@material-ui/icons/Group'
 import SearchIcon from '@material-ui/icons/Search'
 
-import { useFetchMembers, usePostMember } from 'services/absences'
+import { useFetchWorkers, usePostMember } from 'services/absences'
 
 const MemberSelector = (props) => {
   const { team = null } = props
 
   const [filter, setFilter] = useState()
-  const [filteredMembers, setFilteredMembers] = useState(false)
-  const [{ members, loadingMembers, errorMembers }, fetchMembers] = useFetchMembers()
+  const [filteredWorkers, setFilteredWorkers] = useState(false)
+  const [{ workers, loadingWorkers, errorWorkers }, fetchWorkers] = useFetchWorkers()
   const [{ responsePostMember, loadingPostMember, errorPostMember }, postMember] = usePostMember()
 
   useEffect(() => {
-    fetchMembers()
+    fetchWorkers()
   }, [])
 
   useEffect(() => {
-    if (members?.results) {
+    if (workers?.results) {
       const exp = new RegExp(filter, 'i')
-      const filtered = members.results.filter(member => member.first_name.match(exp) || member.last_name.match(exp) || member.email.match(exp))
-      setFilteredMembers(filtered)
+      const filtered = workers.results.filter(worker => worker.first_name.match(exp) || worker.last_name.match(exp) || worker.email.match(exp))
+      setFilteredWorkers(filtered)
     }
   }, [filter])
 
@@ -37,8 +37,8 @@ const MemberSelector = (props) => {
     console.log(event.target.value)
   }
 
-  const handleAdd = (member) => {
-    postMember({ worker: member?.id, team: team?.id })
+  const handleAdd = (worker) => {
+    postMember({ worker: worker?.id, team: team?.id })
   }
 
   return (
@@ -54,13 +54,13 @@ const MemberSelector = (props) => {
         }}
       />
       {
-        members?.results
+        workers?.results
           ? <MembersList
-            members={filteredMembers || members.results}
+            members={filteredWorkers || workers.results}
             gridItemSize={12}
             onAdd={handleAdd}
           />
-          : loadingMembers
+          : loadingWorkers
             ? <SkeletonList numItems={15} />
             : <></>
       }

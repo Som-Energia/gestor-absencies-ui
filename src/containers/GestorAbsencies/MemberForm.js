@@ -22,7 +22,7 @@ import VpnKeyIcon from '@material-ui/icons/VpnKey'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-import { useFetchMember, useFetchVacationPolicy, useFetchCategories, useFetchGender, usePostWorker, useRemoveWorker } from 'services/absences'
+import { useFetchWorkers, useFetchVacationPolicy, useFetchCategories, useFetchGender, usePostWorker, useRemoveWorker } from 'services/absences'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -45,7 +45,7 @@ const MemberForm = (props) => {
   const [editable, setEditable] = useState(!memberId)
   const [formResponse, setFormResponse] = useState(false)
 
-  const [{ member, loading, error }, fetchMember] = useFetchMember()
+  const [{ workers, loadingWorkers, errorWorkers }, fetchWorkers] = useFetchWorkers()
   const [{ vacationPolicy, loadingVacationPolicy, errorVacationPolicy }, loadVacationPolicy] = useFetchVacationPolicy()
   const [{ gender, loadingGender, errorGender }, loadGender] = useFetchGender()
   const [{ categories, loadingCategories, errorCategories }, loadCategories] = useFetchCategories()
@@ -53,7 +53,7 @@ const MemberForm = (props) => {
   const [{ responseRemove, loadingRemoveWorker, errorRemoveWorker }, removeWorker] = useRemoveWorker()
 
   useEffect(() => {
-    memberId && fetchMember(memberId)
+    memberId && fetchWorkers(memberId)
     loadVacationPolicy()
     loadCategories()
     loadGender()
@@ -93,7 +93,7 @@ const MemberForm = (props) => {
         enableReinitialize={true}
         validateOnMount
         isInitialValid={false}
-        initialValues={{ ...initialMember, ...member }}
+        initialValues={{ ...initialMember, ...workers }}
         validationSchema={
           Yup.object().shape(
             {

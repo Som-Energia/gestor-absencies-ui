@@ -6,18 +6,22 @@ import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 
 import Grid from '@material-ui/core/Grid'
+import IconButton from '@material-ui/core/IconButton'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
+import TextField from '@material-ui/core/TextField'
 import Tooltip from '@material-ui/core/Tooltip'
 import Paper from '@material-ui/core/Paper'
 
 import YearMonthHeader from 'components/GestorAbsencies/YearMonthHeader'
 
-import { useFetch, useFetchAbsencesType, useFetchMembers } from 'services/absences'
+import SearchIcon from '@material-ui/icons/Search'
+
+import { useFetch, useFetchAbsencesType, useFetchMembers, useFetchTeams, useFetchWorkers } from 'services/absences'
 import { absenceTypeEmoji, absenceTypeName } from 'services/utils'
 
 const useStyles = makeStyles((theme) => ({

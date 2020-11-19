@@ -39,36 +39,41 @@ export const useFetch = () => {
   return [{ data, loading, error }, load]
 }
 
-export const useFetchMember = () => {
-  const [member, setMember] = useState({})
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
+export const useFetchWorkers = () => {
+  const [workers, setWorkers] = useState({})
+  const [loadingWorkers, setLoading] = useState(false)
+  const [errorWorkers, setError] = useState(false)
 
   const { user } = useAuthState()
 
   const init = () => {
-    setMember(null)
+    setWorkers(null)
     setLoading(false)
     setError(false)
   }
 
-  const load = async (memberId) => {
+  const load = async (workerId = false) => {
     init()
     setLoading(true)
     try {
-      const result = await axios.get(`${API_URL}/absencies/workers/${memberId}`, {
+      const URL = workerId
+        ? `${API_URL}/absencies/workers/${workerId}`
+        : `${API_URL}/absencies/workers`
+
+      const result = await axios.get(URL, {
+        timeout: 10000,
         headers: {
           Authorization: `JWT ${user?.token}`
         }
       })
-      setMember(result?.data)
+      setWorkers(result?.data)
     } catch (e) {
       setError(true)
     }
     setLoading(false)
   }
 
-  return [{ member, loading, error }, load]
+  return [{ workers, loadingWorkers, errorWorkers }, load]
 }
 
 export const useFetchMembers = () => {
@@ -88,17 +93,17 @@ export const useFetchMembers = () => {
     init()
     setLoading(true)
     try {
-      const URL = !teamId
-        ? `${API_URL}/absencies/workers`
+      const memberURL = !teamId
+        ? `${API_URL}/absencies/members`
         : `${API_URL}/absencies/members?team=${teamId}`
 
-      const result = await axios.get(URL, {
+      const membersResult = await axios.get(memberURL, {
         timeout: 10000,
         headers: {
           Authorization: `JWT ${user?.token}`
         }
       })
-      setMembers(result?.data)
+      setMembers(membersResult?.data)
     } catch (e) {
       setError('No s\'han pogut obtenir les dades')
     }

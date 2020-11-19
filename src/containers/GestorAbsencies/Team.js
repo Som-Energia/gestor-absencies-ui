@@ -18,7 +18,7 @@ import MemberSelector from 'containers/GestorAbsencies/ET/MemberSelector'
 import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined'
 import GroupIcon from '@material-ui/icons/Group'
 
-import { useFetchMembers } from 'services/absences'
+import { useFetchWorkers } from 'services/absences'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -51,13 +51,13 @@ const Team = (props) => {
   const { team } = props
   const { id, name } = team
 
-  const [{ members, loadingMembers, errorMembers }, fetchMembers] = useFetchMembers()
-  const [filteredMembers, setFilteredMembers] = useState(false)
+  const [{ workers, loadingWorkers, errorWorkers }, fetchWorkers] = useFetchWorkers()
+  const [filteredWorkers, setFilteredWorkers] = useState(false)
 
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    fetchMembers(id)
+    fetchWorkers(id)
   }, [id])
 
   const handleClick = () => {
@@ -79,12 +79,12 @@ const Team = (props) => {
         <CardContent>
           <h5>Membres de l'equip</h5>
           {
-            members?.results
+            workers?.results
               ? <MembersList
-                members={members.results}
+                members={workers.results}
                 onDelete={handleDelete}
               />
-              : loadingMembers
+              : loadingWorkers
                 ? <SkeletonList numItems={15} />
                 : <></>
           }

@@ -15,7 +15,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import AddIcon from '@material-ui/icons/Add'
 
 import { useAuthState } from 'context/auth'
-import { useFetch, useFetchAbsencesType, useFetchMember } from 'services/absences'
+import { useFetch, useFetchAbsencesType, useFetchWorkers } from 'services/absences'
 import { HOLIDAYS_ABSENCE_TYPE, countAbsencesType } from 'services/utils'
 
 import AbsAnualCalendar from 'components/GestorAbsencies/AbsAnualCalendar'
@@ -111,12 +111,12 @@ const Absences = () => {
 
   const [{ data, loading, error }, fetch] = useFetch()
   const [{ types, loadingTypes, errorTypes }, fetchTypes] = useFetchAbsencesType()
-  const [{ member, loadingMember, errorMember }, fetchMember] = useFetchMember()
+  const [{ worker, loadingWorker, errorWorker }, fetchWorkers] = useFetchWorkers()
 
   useEffect(() => {
     fetch(`/absencies/absences?worker=${user_id}&start_period=${year}-01-01&end_period=${year}-12-31`)
     fetchTypes()
-    fetchMember(user_id)
+    fetchWorkers(user_id)
   }, [year, user_id])
 
   useEffect(() => {
@@ -187,7 +187,7 @@ const Absences = () => {
                   <div className={classes.superDesc}>DIES TOTALS</div>
                 </div>
                 <div className={classes.resumItem}>
-                  <div className={classes.super}>{member?.holidays ? member?.holidays : '-' }</div>
+                  <div className={classes.super}>{worker?.holidays ? worker?.holidays : '-' }</div>
                   <div className={classes.superDesc}>DIES DISPONIBLES</div>
                 </div>
                 <div className={classes.resumItem}>
@@ -224,7 +224,7 @@ const Absences = () => {
           <AddIcon />
         </Fab>
       </Zoom>
-      <SnackbarResponse state={false} message={error || errorMember || errorTypes} onClose={() => {}} />
+      <SnackbarResponse state={false} message={error || errorWorker || errorTypes} onClose={() => {}} />
       <SnackbarResponse state={formResponse?.state} message={formResponse?.message} onClose={() => setFormResponse({})} />
     </>
   )

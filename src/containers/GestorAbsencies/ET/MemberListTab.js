@@ -16,7 +16,7 @@ import MemberForm from 'containers/GestorAbsencies/MemberForm'
 
 import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined'
 
-import { useFetchMembers, useRemoveWorker } from 'services/absences'
+import { useFetchWorkers, useRemoveWorker } from 'services/absences'
 
 const useStyles = makeStyles((theme) => ({
   fab: {
@@ -35,17 +35,17 @@ const MembersListTab = (props) => {
   const [formResponse, setFormResponse] = useState({})
 
   const [filteredMembers, setFilteredMembers] = useState(false)
-  const [{ members, loadingMembers, errorMembers }, fetchMembers] = useFetchMembers()
+  const [{ workers, loadingWorkers, errorWorkers }, fetchWorkers] = useFetchWorkers()
   const [{ responseRemoveWorker, loadingRemoveWorker, errorRemoveWorker }, removeWorker] = useRemoveWorker()
 
   useEffect(() => {
-    fetchMembers()
+    fetchWorkers()
   }, [responseRemoveWorker])
 
   useEffect(() => {
-    if (members?.results) {
+    if (errorWorkers?.results) {
       const exp = new RegExp(filter, 'i')
-      const filtered = members.results.filter(member => member.first_name.match(exp) || member.last_name.match(exp) || member.email.match(exp))
+      const filtered = workers.results.filter(worker => worker.first_name.match(exp) || worker.last_name.match(exp) || worker.email.match(exp))
       setFilteredMembers(filtered)
     }
   }, [filter])
@@ -59,33 +59,33 @@ const MembersListTab = (props) => {
     setOpen(false)
     setFormResponse(response)
     response?.state === true &&
-      fetchMembers()
+    fetchWorkers()
   }
 
   const handleClose = () => {
     setOpen(false)
   }
 
-  const handleEdit = (member) => {
-    const { id } = member
+  const handleEdit = (worker) => {
+    const { id } = worker
     setOpen(true)
     setMemberId(id)
   }
 
-  const handleDelete = (member) => {
-    removeWorker(member)
+  const handleDelete = (worker) => {
+    removeWorker(worker)
   }
 
   return (
     <>
       {
-        members?.results
+        workers?.results
           ? <MembersList
-            members={filteredMembers || members.results}
+            members={filteredMembers || workers.results}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
-          : loadingMembers
+          : loadingWorkers
             ? <SkeletonList numItems={15} />
             : <></>
       }
@@ -109,7 +109,7 @@ const MembersListTab = (props) => {
           <PersonAddOutlinedIcon />
         </Fab>
       </Zoom>
-      <SnackbarResponse state={false} message={errorMembers || errorRemoveWorker} onClose={() => {}} />
+      <SnackbarResponse state={false} message={errorWorkers || errorRemoveWorker} onClose={() => {}} />
       <SnackbarResponse state={formResponse?.state} message={formResponse?.message} onClose={() => setFormResponse({})} />
     </>
   )
