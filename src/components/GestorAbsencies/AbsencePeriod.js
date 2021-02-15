@@ -81,11 +81,21 @@ const useStyles = makeStyles((theme) => ({
 
 const AbsencePeriod = (props) => {
   const classes = useStyles()
-  const { absence, types } = props
+  const { absence, types, onEdit, onDelete } = props
   const { start_time, end_time, absence_type } = absence
 
   const duration = moment(end_time).diff(moment(start_time), 'd') + 1
   const absenceType = absenceTypeName(types, absence_type)
+
+  const handleEdit = () => {
+    onEdit &&
+      onEdit(absence)
+  }
+
+  const handleDelete = () => {
+    onDelete &&
+      onDelete(absence)
+  }
 
   return (
     <div className={classes.item}>
@@ -133,7 +143,10 @@ const AbsencePeriod = (props) => {
           </div>
         }
       </div>
-      <EditMenu onEdit={ () => console.log('edit!') } />
+      <EditMenu
+        onEdit={ () => handleEdit(absence) }
+        onDelete={ () => handleDelete(absence) }
+      />
     </div>
   )
 }
