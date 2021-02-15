@@ -4,7 +4,7 @@ import Avatar from '@material-ui/core/Avatar'
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import Grid from '@material-ui/core/Grid'
-import Zoom from '@material-ui/core/Zoom'
+import Fade from '@material-ui/core/Fade'
 
 import EditMenu from '../EditMenu'
 
@@ -36,7 +36,7 @@ const TeamsList = (props) => {
       {
         teams.map(team => (
           <Grid key={team.id} className={classes.listItem} item xs={12} sm={4}>
-            <Zoom in={true}>
+            <Fade in={true}>
               <Card className={classes.card} elevation={0}>
                 <CardHeader
                   avatar={
@@ -56,7 +56,7 @@ const TeamsList = (props) => {
                   subheader={''}
                 />
               </Card>
-            </Zoom>
+            </Fade>
           </Grid>
         ))
       }

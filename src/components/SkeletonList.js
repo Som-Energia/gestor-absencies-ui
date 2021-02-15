@@ -5,7 +5,7 @@ import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import Grid from '@material-ui/core/Grid'
 import Skeleton from '@material-ui/lab/Skeleton'
-import Zoom from '@material-ui/core/Zoom'
+import Fade from '@material-ui/core/Fade'
 
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -34,7 +34,7 @@ const SkeletonList = ({ numItems }) => {
       {
         [...new Array(numItems)].map((item, index) => (
           <Grid key={index} className={classes.listItem} item xs={12} sm={4}>
-            <Zoom in={true}>
+            <Fade in={true}>
               <Skeleton variant="rect" width="100%">
                 <Card className={classes.card} elevation={0}>
                   <CardHeader
@@ -42,7 +42,7 @@ const SkeletonList = ({ numItems }) => {
                   />
                 </Card>
               </Skeleton>
-            </Zoom>
+            </Fade>
           </Grid>
         ))
       }

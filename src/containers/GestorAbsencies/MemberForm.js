@@ -13,7 +13,7 @@ import Fab from '@material-ui/core/Fab'
 import Grid from '@material-ui/core/Grid'
 import MenuItem from '@material-ui/core/MenuItem'
 import TextField from '@material-ui/core/TextField'
-import Zoom from '@material-ui/core/Zoom'
+import Fade from '@material-ui/core/Fade'
 
 import EditIcon from '@material-ui/icons/Edit'
 import SaveIcon from '@material-ui/icons/Save'
@@ -418,7 +418,7 @@ const MemberForm = (props) => {
                 }
               </Grid>
             </Grid>
-            <Zoom in={editable} disableStrictModeCompat={true}>
+            <Fade in={editable} disableStrictModeCompat={true}>
               <Fab
                 color="primary"
                 aria-label="save"
@@ -428,8 +428,8 @@ const MemberForm = (props) => {
               >
                 <SaveIcon />
               </Fab>
-            </Zoom>
-            <Zoom in={!editable} disableStrictModeCompat={true}>
+            </Fade>
+            <Fade in={!editable} disableStrictModeCompat={true}>
               <Fab
                 color="primary"
                 aria-label="edit"
@@ -438,7 +438,7 @@ const MemberForm = (props) => {
               >
                 <EditIcon />
               </Fab>
-            </Zoom>
+            </Fade>
           </form>
         )}
       </Formik>

@@ -4,7 +4,7 @@ import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
 import Fab from '@material-ui/core/Fab'
-import Zoom from '@material-ui/core/Zoom'
+import Fade from '@material-ui/core/Fade'
 
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -90,7 +90,7 @@ const Team = (props) => {
           }
         </CardContent>
       </Card>
-      <Zoom in={true} disableStrictModeCompat={true}>
+      <Fade in={true} disableStrictModeCompat={true}>
         <Fab
           color="primary"
           aria-label="edit"
@@ -99,7 +99,7 @@ const Team = (props) => {
         >
           <PersonAddOutlinedIcon />
         </Fab>
-      </Zoom>
+      </Fade>
       <ModalForm
         title={`Afegir membres a l'equip ${name}`}
         open={open}

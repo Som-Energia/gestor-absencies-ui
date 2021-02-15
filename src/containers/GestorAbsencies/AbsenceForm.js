@@ -16,7 +16,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Grid from '@material-ui/core/Grid'
 import MenuItem from '@material-ui/core/MenuItem'
 import TextField from '@material-ui/core/TextField'
-import Zoom from '@material-ui/core/Zoom'
+import Fade from '@material-ui/core/Fade'
 
 import IconButton from '@material-ui/core/IconButton'
 
@@ -220,7 +220,7 @@ const AbsenceForm = (props) => {
               </Grid>
             </Grid>
             <Box mb={3}>
-              <Zoom in={editable} disableStrictModeCompat={true}>
+              <Fade in={editable} disableStrictModeCompat={true}>
                 <Fab
                   color="primary"
                   aria-label="save"
@@ -230,7 +230,7 @@ const AbsenceForm = (props) => {
                 >
                   <SaveIcon />
                 </Fab>
-              </Zoom>
+              </Fade>
             </Box>
           </form>
         )}

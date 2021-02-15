@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import Alert from '@material-ui/lab/Alert'
 import Fab from '@material-ui/core/Fab'
 import Snackbar from '@material-ui/core/Snackbar'
-import Zoom from '@material-ui/core/Zoom'
+import Fade from '@material-ui/core/Fade'
 
 import ModalForm from 'components/ModalForm'
 import MembersList from 'components/GestorAbsencies/MembersList'
@@ -99,7 +99,7 @@ const MembersListTab = (props) => {
       >
         <MemberForm memberId={memberId} onSuccess={handleAccept} onError={() => {}} />
       </ModalForm>
-      <Zoom in={true} disableStrictModeCompat={true}>
+      <Fade in={true} disableStrictModeCompat={true}>
         <Fab
           color="primary"
           aria-label="edit"
@@ -108,7 +108,7 @@ const MembersListTab = (props) => {
         >
           <PersonAddOutlinedIcon />
         </Fab>
-      </Zoom>
+      </Fade>
       <SnackbarResponse state={false} message={errorMembers || errorRemoveWorker} onClose={() => {}} />
       <SnackbarResponse state={formResponse?.state} message={formResponse?.message} onClose={() => setFormResponse({})} />
     </>

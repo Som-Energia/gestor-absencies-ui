@@ -79,7 +79,6 @@ const Calendar = () => {
       }
       const diff = Math.round(Math.abs(moment(absence.end_time).diff(absence.start_time, 'hours')) / 8)
       if (diff > 0) {
-        console.log(diff)
         const arr = [... Array(diff)]
         arr.map((value, index) => {
           const data = moment(absence.start_time).add(index, 'days').format('DDMMYYYY')
@@ -87,7 +86,6 @@ const Calendar = () => {
         })
       }
     })
-    console.log(absencesGrid)
   }, [data])
 
   const nextMonth = () => {

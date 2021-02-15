@@ -7,7 +7,7 @@ import Button from '@material-ui/core/Button'
 import Fab from '@material-ui/core/Fab'
 import Grid from '@material-ui/core/Grid'
 import TextField from '@material-ui/core/TextField'
-import Zoom from '@material-ui/core/Zoom'
+import Fade from '@material-ui/core/Fade'
 
 import EditIcon from '@material-ui/icons/Edit'
 import SaveIcon from '@material-ui/icons/Save'
@@ -142,7 +142,7 @@ const TeamForm = (props) => {
                 }
               </Grid>
             </Grid>
-            <Zoom in={editable} disableStrictModeCompat={true}>
+            <Fade in={editable} disableStrictModeCompat={true}>
               <Fab
                 color="primary"
                 aria-label="save"
@@ -152,8 +152,8 @@ const TeamForm = (props) => {
               >
                 <SaveIcon />
               </Fab>
-            </Zoom>
-            <Zoom in={!editable} disableStrictModeCompat={true}>
+            </Fade>
+            <Fade in={!editable} disableStrictModeCompat={true}>
               <Fab
                 color="primary"
                 aria-label="edit"
@@ -162,7 +162,7 @@ const TeamForm = (props) => {
               >
                 <EditIcon />
               </Fab>
-            </Zoom>
+            </Fade>
           </form>
         )}
       </Formik>

@@ -7,7 +7,7 @@ import CardContent from '@material-ui/core/CardContent'
 import Fab from '@material-ui/core/Fab'
 import Grid from '@material-ui/core/Grid'
 import Skeleton from '@material-ui/lab/Skeleton'
-import Zoom from '@material-ui/core/Zoom'
+import Fade from '@material-ui/core/Fade'
 import SnackbarResponse from 'components/SnackbarResponse'
 
 import { makeStyles } from '@material-ui/core/styles'
@@ -79,8 +79,12 @@ const useStyles = makeStyles((theme) => ({
 
 const Absences = () => {
   const classes = useStyles()
+
   const [year, setYear] = useState(moment().year())
+
   const [open, setOpen] = useState(false)
+  const [absenceForm, setAbsenceForm] = useState()
+
   const [totalAbsences, setTotalAbsences] = useState('-')
   const [totalHolidays, setTotalHolidays] = useState('-')
   const [formResponse, setFormResponse] = useState({})
@@ -106,6 +110,11 @@ const Absences = () => {
     setOpen(false)
   }
 
+  const handleEdit = (absence) => {
+    setOpen(true)
+    setAbsenceForm(absence)
+  }
+
   const { user } = useAuthState()
   const { user_id } = user
 
@@ -122,7 +131,6 @@ const Absences = () => {
   useEffect(() => {
     data?.results && setTotalHolidays(countAbsencesType(data?.results, HOLIDAYS_ABSENCE_TYPE))
     data?.results && setTotalAbsences(countAbsencesType(data?.results))
-    console.log('data: ', data)
   }, [data])
 
   return (
@@ -139,13 +147,13 @@ const Absences = () => {
           {
             data?.results && types?.results &&
               data?.results.map((absence, index) => (
-                <Zoom key={index} in={true}>
+                <Fade key={index} in={true}>
                   <Card className={clsx(classes.paper, !index && classes.noMarginTop)} elevation={0}>
                     <CardContent className={classes.contentItem}>
-                      <AbsencePeriod absence={absence} types={types?.results} />
+                      <AbsencePeriod absence={absence} types={types?.results} onEdit={handleEdit} />
                     </CardContent>
                   </Card>
-                </Zoom>
+                </Fade>
               ))
           }
 
@@ -155,7 +163,7 @@ const Absences = () => {
                 {
                   loading
                     ? [...new Array(7)].map((value, index) => (
-                      <Zoom key={index} in={loading}>
+                      <Fade key={index} in={loading}>
                         <Skeleton variant="rect" width="100%">
                           <Card className={clsx(classes.paper, !index && classes.noMarginTop)} elevation={0}>
                             <CardContent className={classes.contentItem}>
@@ -163,9 +171,9 @@ const Absences = () => {
                             </CardContent>
                           </Card>
                         </Skeleton>
-                      </Zoom>
+                      </Fade>
                     ))
-                    : <Zoom in={true}>
+                    : <Fade in={true}>
                       <Card className={clsx(classes.paper, classes.noMarginTop)} elevation={0}>
                         <CardContent className={classes.contentItem}>
                           <div className={classes.emptyContent}>
@@ -173,7 +181,7 @@ const Absences = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    </Zoom>
+                    </Fade>
                 }
               </>
           }
@@ -205,16 +213,8 @@ const Absences = () => {
           </Card>
         </Grid>
       </Grid>
-      <ModalForm
-        title={'Nova absència'}
-        open={open}
-        showControls={false}
-        onAccept={handleAccept}
-        onClose={handleClose}
-      >
-        <AbsenceForm absenceId={0} workerId={user_id} onSucces={handleAccept} />
-      </ModalForm>
-      <Zoom in={true} disableStrictModeCompat={true}>
+
+      <Fade in={true} disableStrictModeCompat={true}>
         <Fab
           color="primary"
           aria-label="edit"
@@ -223,7 +223,18 @@ const Absences = () => {
         >
           <AddIcon />
         </Fab>
-      </Zoom>
+      </Fade>
+
+      <ModalForm
+        title={'Nova absència'}
+        open={open}
+        showControls={false}
+        onAccept={handleAccept}
+        onClose={handleClose}
+      >
+        <AbsenceForm absenceId={ absenceForm ? absenceForm?.id : null} workerId={user_id} onSucces={handleAccept} />
+      </ModalForm>
+
       <SnackbarResponse state={false} message={error || errorMember || errorTypes} onClose={() => {}} />
       <SnackbarResponse state={formResponse?.state} message={formResponse?.message} onClose={() => setFormResponse({})} />
     </>
